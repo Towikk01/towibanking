@@ -10,7 +10,10 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
   TransactionNotifier() : super([]);
 
   void addTransaction(Transaction transaction) {
-    state = [...state, transaction];
+    state = [
+      transaction,
+      ...state,
+    ];
   }
 
   //create function of remove transaction

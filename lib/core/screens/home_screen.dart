@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/widgets/transaction_dialog.dart';
+import 'package:towibanking/core/widgets/transaction_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   @override
@@ -13,60 +15,96 @@ class HomeScreen extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          Text('Наличные: ${balance.cash}', style: TextStyle(fontSize: 16)),
-          Text('Общий: ${balance.cash + balance.card}',
-              style: TextStyle(fontSize: 16)),
-          Text('Карта: ${balance.card}', style: TextStyle(fontSize: 16))
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Наличные',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                '${balance.cash}',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Карта:',
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                '${balance.card}',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Общий:',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                '${balance.cash + balance.card}',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ]),
       ),
       child: Stack(
         children: [
-          Column(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              const Text('Последние транзакции',
-                  style: TextStyle(fontSize: 24)),
-              SizedBox(
-                height: 20,
-              ),
-              Expanded(
-                child: ListView.separated(
-                  separatorBuilder: (context, index) =>
-                      Container(height: 1, color: CupertinoColors.systemGrey4),
-                  itemCount: transactions.length,
-                  itemBuilder: (context, index) {
-                    final transaction = transactions[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: transaction.type == 'income'
-                            ? CupertinoColors.systemGreen
-                            : CupertinoColors.systemGrey6,
-                      ),
-                      child: CupertinoListTile(
-                        padding: const EdgeInsets.all(16),
-                        leading: Icon(transaction.type == 'income'
-                            ? CupertinoIcons.plus
-                            : CupertinoIcons.minus),
-                        title: Text(
-                            '${transaction.type == 'income' ? 'Приход' : 'Расход'} - \$${transaction.amount.toStringAsFixed(2)}'),
-                        subtitle: Text(
-                            '${transaction.category} - ${transaction.paymentMethod}'),
-                      ),
-                    );
-                  },
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 15,
                 ),
-              ),
-            ],
+                const Text(
+                  'Последние транзакции',
+                  style: TextStyle(fontSize: 22),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                transactions.isNotEmpty
+                    ? Expanded(
+                        child: ListView.separated(
+                          separatorBuilder: (context, index) => Container(
+                              height: 1, color: CupertinoColors.systemGrey4),
+                          itemCount: transactions.length,
+                          itemBuilder: (context, index) {
+                            final transaction = transactions[index];
+                            return TransactionWidget(transaction: transaction);
+                          },
+                        ),
+                      )
+                    : const Text('Еще нет транзакций...',
+                        style: TextStyle(fontSize: 16))
+              ],
+            ),
           ),
           Positioned(
             bottom: 20,
             right: 20,
             child: CupertinoButton.filled(
-              padding: EdgeInsets.all(16),
-              child: Icon(CupertinoIcons.add),
+              borderRadius: BorderRadius.circular(30),
+              padding: const EdgeInsets.all(16),
+              child: const Icon(CupertinoIcons.add),
               onPressed: () {
                 _showTransactionDialog(context, ref);
               },
@@ -81,7 +119,7 @@ class HomeScreen extends ConsumerWidget {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return CupertinoAlertDialog(
+        return const CupertinoAlertDialog(
           title: Text('Добавить транзакцию'),
           content: TransactionDialogContent(),
         );

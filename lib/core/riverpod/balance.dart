@@ -22,17 +22,17 @@ class BalanceNotifier extends StateNotifier<Balance> {
   BalanceNotifier() : super(Balance());
 
   void addMoney(double amount, String type) {
-    if (type == 'cash') {
+    if (type == 'Наличные') {
       state = state.copyWith(cash: state.cash + amount);
-    } else if (type == 'card') {
+    } else if (type == 'Карта') {
       state = state.copyWith(card: state.card + amount);
     }
   }
 
   void removeMoney(double amount, String type) {
-    if (type == 'cash') {
+    if (type == 'Наличные') {
       state = state.copyWith(cash: state.cash - amount);
-    } else if (type == 'card') {
+    } else if (type == 'Карта') {
       state = state.copyWith(card: state.card - amount);
     }
   }

@@ -9,7 +9,7 @@ class CategoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8), // Add padding to the container
+      padding: const EdgeInsets.all(8), // Add padding to the container
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         color: CupertinoColors.systemGrey6, // Add a background color
@@ -18,9 +18,9 @@ class CategoryWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Ensure the column takes minimal space
         children: [
           Icon(icon, size: 24), // Display icon with size
-          SizedBox(height: 4), // Space between icon and text
+          const SizedBox(height: 4), // Space between icon and text
           Text(
-            '$category',
+            category,
             style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

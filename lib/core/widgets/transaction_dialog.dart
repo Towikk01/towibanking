@@ -1,78 +1,94 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
+import 'package:towibanking/core/riverpod/category.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 
 class TransactionDialogContent extends ConsumerStatefulWidget {
   const TransactionDialogContent({super.key});
 
   @override
-  _TransactionDialogContentState createState() =>
-      _TransactionDialogContentState();
+  TransactionDialogContentState createState() =>
+      TransactionDialogContentState();
 }
 
-class _TransactionDialogContentState
+class TransactionDialogContentState
     extends ConsumerState<TransactionDialogContent> {
   String _transactionType = 'income';
-  String _paymentMethod = 'cash';
-  String _selectedCategory = 'Food';
+  String _paymentMethod = 'Наличные';
+  Category _selectedCategory = defaultSpendCategories.first;
   double _amount = 0.0;
+  final TextEditingController _transactionComment = TextEditingController();
 
-  void _submitTransaction() {
+  void submitTransaction() {
     if (_amount <= 0) {
-      // Optional: Show an error message or return
       return;
     }
 
-    // Create a new transaction object
     final transaction = Transaction(
       amount: _amount,
       type: _transactionType,
       paymentMethod: _paymentMethod,
       category: _selectedCategory,
       date: DateTime.now(),
+      comment: _transactionComment.text == '' ? null : _transactionComment.text,
     );
 
-    // Add the transaction to the transaction provider
     ref.read(transactionProvider.notifier).addTransaction(transaction);
 
-    // Update the balance provider
     if (_transactionType == 'income') {
       ref.read(balanceProvider.notifier).addMoney(_amount, _paymentMethod);
     } else if (_transactionType == 'expense') {
       ref.read(balanceProvider.notifier).removeMoney(_amount, _paymentMethod);
     }
 
-    // Close the dialog
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final categories = ref.watch(categoriesProvider);
+    final currentCategories = _transactionType == 'income'
+        ? categories['inc']!
+        : categories['spend']!;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Transaction type selection (Income/Expense)
         CupertinoSegmentedControl<String>(
-          children: const {
-            'income': Text('Приход'),
-            'expense': Text('Расход'),
+          padding: const EdgeInsets.all(10),
+          children: {
+            'expense': Container(
+                padding: const EdgeInsets.all(10),
+                child: const Text('Расход', style: TextStyle(fontSize: 20))),
+            'income': Container(
+                padding: const EdgeInsets.all(10),
+                child: const Text(
+                  'Приход',
+                  style: TextStyle(fontSize: 20),
+                )),
           },
           onValueChanged: (value) {
             setState(() {
               _transactionType = value;
+              _selectedCategory = _transactionType == 'income'
+                  ? defaultIncCategories.first
+                  : defaultSpendCategories.first;
             });
           },
           groupValue: _transactionType,
         ),
         const SizedBox(height: 10),
-
-        // Payment method selection (Cash/Card)
         CupertinoSegmentedControl<String>(
-          children: const {
-            'cash': Text('Наличные'),
-            'card': Text('Карта'),
+          children: {
+            'Наличные': Container(
+                padding: const EdgeInsets.all(10),
+                child: const Text('Наличные', style: TextStyle(fontSize: 16))),
+            'Карта': Container(
+                padding: const EdgeInsets.all(10),
+                child: const Text('Карта', style: TextStyle(fontSize: 16))),
           },
           onValueChanged: (value) {
             setState(() {
@@ -81,24 +97,21 @@ class _TransactionDialogContentState
           },
           groupValue: _paymentMethod,
         ),
-        const SizedBox(height: 10),
-
-        // Category picker
+        const SizedBox(height: 20),
         CupertinoPicker(
-          itemExtent: 30,
+          itemExtent: 50,
           onSelectedItemChanged: (index) {
             setState(() {
-              _selectedCategory = ['Food', 'Home', 'Transport'][index];
+              _selectedCategory = currentCategories[index];
             });
           },
-          children: ['Food', 'Home', 'Transport'].map((category) {
-            return Text(category);
+          children: currentCategories.map((category) {
+            return Center(child: Text(category.title));
           }).toList(),
         ),
-        const SizedBox(height: 10),
-
-        // Amount input
+        const SizedBox(height: 20),
         CupertinoTextField(
+          padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.number,
           placeholder: 'Введите сумму',
           onChanged: (value) {
@@ -106,11 +119,27 @@ class _TransactionDialogContentState
           },
         ),
         const SizedBox(height: 20),
-
-        // Submit button
+        CupertinoTextField(
+          padding: const EdgeInsets.all(20),
+          keyboardType: TextInputType.text,
+          placeholder: 'Введите комментарий',
+          controller: _transactionComment,
+        ),
+        const SizedBox(
+          height: 20,
+        ),
         CupertinoDialogAction(
-          onPressed: _submitTransaction,
-          child: const Text('Добавить'),
+          onPressed: submitTransaction,
+          child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+              decoration: BoxDecoration(
+                color: CupertinoColors.activeBlue,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                'Добавить',
+                style: TextStyle(color: CupertinoColors.white),
+              )),
         ),
       ],
     );

@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
-      title: 'My Cupertino App',
+      title: 'Towibanking',
       debugShowCheckedModeBanner: false,
       theme: const CupertinoThemeData(
           brightness: Brightness.light,
