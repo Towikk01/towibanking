@@ -5,11 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
+import 'package:intl/intl.dart';
 
 class TransactionWidget extends ConsumerWidget {
   final Transaction transaction;
 
   const TransactionWidget({super.key, required this.transaction});
+
+  String formattedDate(DateTime date) {
+    return DateFormat('dd-MM-yy').format(date);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +47,7 @@ class TransactionWidget extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: transaction.type == 'income'
-              ? CupertinoColors.systemGreen
+              ? Color.fromARGB(170, 137, 236, 209)
               : CupertinoColors.systemGrey6,
         ),
         child: CupertinoListTile(
@@ -54,14 +59,19 @@ class TransactionWidget extends ConsumerWidget {
             transaction.category.icon,
             size: 34,
           ),
-          trailing: Icon(
-            color: transaction.type == 'income'
-                ? CupertinoColors.systemBlue
-                : CupertinoColors.systemRed,
-            transaction.type == 'income'
-                ? CupertinoIcons.add_circled
-                : CupertinoIcons.minus_circled,
-            size: 44,
+          trailing: Column(
+            children: [
+              Icon(
+                color: transaction.type == 'income'
+                    ? CupertinoColors.systemBlue
+                    : CupertinoColors.systemRed,
+                transaction.type == 'income'
+                    ? CupertinoIcons.add_circled
+                    : CupertinoIcons.minus_circled,
+                size: 44,
+              ),
+              Text(formattedDate(transaction.date))
+            ],
           ),
           title: Text(
               '${transaction.category.title} - ${transaction.amount.toStringAsFixed(2)} грн.'),

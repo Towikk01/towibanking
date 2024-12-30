@@ -1,13 +1,12 @@
+// transaction_dialog.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:towibanking/core/models/category.dart';
-import 'package:towibanking/core/models/transaction.dart';
-import 'package:towibanking/core/riverpod/balance.dart';
+import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/category.dart';
-import 'package:towibanking/core/riverpod/transaction.dart';
 
 class TransactionDialogContent extends ConsumerStatefulWidget {
-  const TransactionDialogContent({super.key});
+  final TransactionForm transactionForm;
+  const TransactionDialogContent({super.key, required this.transactionForm});
 
   @override
   TransactionDialogContentState createState() =>
@@ -16,41 +15,13 @@ class TransactionDialogContent extends ConsumerStatefulWidget {
 
 class TransactionDialogContentState
     extends ConsumerState<TransactionDialogContent> {
-  String _transactionType = 'income';
-  String _paymentMethod = 'Наличные';
-  Category _selectedCategory = defaultSpendCategories.first;
-  double _amount = 0.0;
   final TextEditingController _transactionComment = TextEditingController();
-
-  void submitTransaction() {
-    if (_amount <= 0) {
-      return;
-    }
-
-    final transaction = Transaction(
-      amount: _amount,
-      type: _transactionType,
-      paymentMethod: _paymentMethod,
-      category: _selectedCategory,
-      date: DateTime.now(),
-      comment: _transactionComment.text == '' ? null : _transactionComment.text,
-    );
-
-    ref.read(transactionProvider.notifier).addTransaction(transaction);
-
-    if (_transactionType == 'income') {
-      ref.read(balanceProvider.notifier).addMoney(_amount, _paymentMethod);
-    } else if (_transactionType == 'expense') {
-      ref.read(balanceProvider.notifier).removeMoney(_amount, _paymentMethod);
-    }
-
-    Navigator.pop(context);
-  }
 
   @override
   Widget build(BuildContext context) {
+    final form = widget.transactionForm;
     final categories = ref.watch(categoriesProvider);
-    final currentCategories = _transactionType == 'income'
+    final currentCategories = widget.transactionForm.transactionType == 'income'
         ? categories['inc']!
         : categories['spend']!;
 
@@ -72,13 +43,13 @@ class TransactionDialogContentState
           },
           onValueChanged: (value) {
             setState(() {
-              _transactionType = value;
-              _selectedCategory = _transactionType == 'income'
+              form.transactionType = value;
+              form.selectedCategory = form.transactionType == 'income'
                   ? defaultIncCategories.first
                   : defaultSpendCategories.first;
             });
           },
-          groupValue: _transactionType,
+          groupValue: form.transactionType,
         ),
         const SizedBox(height: 10),
         CupertinoSegmentedControl<String>(
@@ -92,17 +63,64 @@ class TransactionDialogContentState
           },
           onValueChanged: (value) {
             setState(() {
-              _paymentMethod = value;
+              form.paymentMethod = value;
             });
           },
-          groupValue: _paymentMethod,
+          groupValue: form.paymentMethod,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
+        CupertinoButton(
+          child: Text(
+            '${form.date!.month}-${form.date!.day}-${form.date!.year}',
+            style: const TextStyle(
+              fontSize: 20.0,
+            ),
+          ),
+          onPressed: () async {
+            final DateTime? selectedDate =
+                await showCupertinoModalPopup<DateTime>(
+              context: context,
+              builder: (BuildContext context) {
+                DateTime tempPickedDate = form.date!;
+                return Container(
+                  height: 250,
+                  color: CupertinoColors.white,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 190,
+                        child: CupertinoDatePicker(
+                          mode: CupertinoDatePickerMode.date,
+                          initialDateTime: form.date,
+                          onDateTimeChanged: (DateTime newDate) {
+                            tempPickedDate = newDate;
+                          },
+                        ),
+                      ),
+                      CupertinoButton(
+                        child: const Text('Выбрать'),
+                        onPressed: () {
+                          Navigator.pop(context, tempPickedDate);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+            if (selectedDate != null) {
+              setState(() {
+                form.date = selectedDate;
+              });
+            }
+          },
+        ),
+        const SizedBox(height: 10),
         CupertinoPicker(
           itemExtent: 50,
           onSelectedItemChanged: (index) {
             setState(() {
-              _selectedCategory = currentCategories[index];
+              form.selectedCategory = currentCategories[index];
             });
           },
           children: currentCategories.map((category) {
@@ -115,7 +133,7 @@ class TransactionDialogContentState
           keyboardType: TextInputType.number,
           placeholder: 'Введите сумму',
           onChanged: (value) {
-            _amount = double.tryParse(value) ?? 0.0;
+            form.amount = double.tryParse(value) ?? 0.0;
           },
         ),
         const SizedBox(height: 20),
@@ -124,22 +142,9 @@ class TransactionDialogContentState
           keyboardType: TextInputType.text,
           placeholder: 'Введите комментарий',
           controller: _transactionComment,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        CupertinoDialogAction(
-          onPressed: submitTransaction,
-          child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-              decoration: BoxDecoration(
-                color: CupertinoColors.activeBlue,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'Добавить',
-                style: TextStyle(color: CupertinoColors.white),
-              )),
+          onChanged: (value) {
+            form.comment = value;
+          },
         ),
       ],
     );

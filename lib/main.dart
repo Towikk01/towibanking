@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/screens/home_screen.dart';
+import 'package:towibanking/core/widgets/tab_bar.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -11,18 +12,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
+    return const CupertinoApp(
       title: 'Towibanking',
       debugShowCheckedModeBanner: false,
-      theme: const CupertinoThemeData(
+      theme: CupertinoThemeData(
           brightness: Brightness.light,
-          primaryColor: CupertinoColors.systemBlue, // BlueAccent equivalent
+          primaryColor: CupertinoColors.systemBlue,
           barBackgroundColor: CupertinoColors.white,
           scaffoldBackgroundColor: CupertinoColors.white,
           textTheme: CupertinoTextThemeData(
             primaryColor: CupertinoColors.black,
           )),
-      home: HomeScreen(),
+      home: TabBar(),
     );
   }
 }
