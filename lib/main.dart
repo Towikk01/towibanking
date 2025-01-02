@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:towibanking/core/screens/home_screen.dart';
 import 'package:towibanking/core/widgets/tab_bar.dart';
 
 void main() {

@@ -20,10 +20,10 @@ class TransactionDialogContentState
   @override
   Widget build(BuildContext context) {
     final form = widget.transactionForm;
-    final categories = ref.watch(categoriesProvider);
+    final categories = ref.watch(unifiedCategoriesProvider);
     final currentCategories = widget.transactionForm.transactionType == 'income'
-        ? categories['inc']!
-        : categories['spend']!;
+        ? categories.where((el) => el.type == 'income').toList()
+        : categories.where((el) => el.type == 'expense').toList();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -45,8 +45,8 @@ class TransactionDialogContentState
             setState(() {
               form.transactionType = value;
               form.selectedCategory = form.transactionType == 'income'
-                  ? defaultIncCategories.first
-                  : defaultSpendCategories.first;
+                  ? defaultCategories.where((el) => el.type == 'income').first
+                  : defaultCategories.where((el) => el.type == 'expense').first;
             });
           },
           groupValue: form.transactionType,
@@ -131,16 +131,16 @@ class TransactionDialogContentState
         CupertinoTextField(
           padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.number,
-          placeholder: 'Введите сумму',
+          placeholder: 'Хау мач',
           onChanged: (value) {
-            form.amount = double.tryParse(value) ?? 0.0;
+            form.amount = double.tryParse(value) ?? 0;
           },
         ),
         const SizedBox(height: 20),
         CupertinoTextField(
           padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.text,
-          placeholder: 'Введите комментарий',
+          placeholder: 'Можно комментик',
           controller: _transactionComment,
           onChanged: (value) {
             form.comment = value;

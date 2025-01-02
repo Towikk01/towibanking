@@ -5,6 +5,7 @@ import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
+import 'package:towibanking/core/theme/app_colors.dart';
 import 'package:towibanking/core/widgets/transaction_dialog.dart';
 import 'package:towibanking/core/widgets/transaction_widget.dart';
 
@@ -68,14 +69,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        border: Border(
+            bottom:
+                const BorderSide(color: CupertinoColors.separator, width: 1)),
         middle:
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Наличные',
-                style: const TextStyle(fontSize: 16),
+                'Наличные:',
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
                 textAlign: TextAlign.center,
               ),
               Text(
@@ -189,7 +195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final TransactionForm transactionForm = TransactionForm(
         transactionType: 'income',
         paymentMethod: 'Наличные',
-        selectedCategory: defaultIncCategories.first,
+        selectedCategory: defaultCategories.first,
         date: DateTime.now(),
         amount: 0);
 
@@ -209,6 +215,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             CupertinoDialogAction(
               child: const Text('Добавить'),
               onPressed: () {
+                if (transactionForm.amount <= 0) return;
                 ref
                     .read(transactionProvider.notifier)
                     .addTransaction(transactionForm.toTransaction());

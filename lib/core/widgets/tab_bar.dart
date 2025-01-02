@@ -38,7 +38,7 @@ class TabBar extends StatelessWidget {
             );
           case 2:
             return CupertinoTabView(
-              builder: (context) => const SettingsScreen(),
+              builder: (context) =>  SettingsScreen(),
             );
           default:
             return CupertinoTabView(

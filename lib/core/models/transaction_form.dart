@@ -1,6 +1,5 @@
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
-import 'package:towibanking/core/riverpod/category.dart';
 
 class TransactionForm {
   String transactionType;
@@ -19,8 +18,6 @@ class TransactionForm {
     this.comment = '',
   });
 
-  
-
   Transaction toTransaction() {
     return Transaction(
       amount: amount,
@@ -31,5 +28,4 @@ class TransactionForm {
       comment: comment.isEmpty ? null : comment,
     );
   }
-  
 }

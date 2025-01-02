@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
@@ -37,7 +36,7 @@ class TransactionWidget extends ConsumerWidget {
         children: [
           SlidableAction(
             onPressed: (context) => removeTransaction(),
-            backgroundColor: CupertinoColors.destructiveRed,
+            backgroundColor: const Color.fromARGB(255, 205, 50, 42),
             foregroundColor: CupertinoColors.white,
             icon: CupertinoIcons.delete,
             label: 'Удалить',
@@ -74,12 +73,14 @@ class TransactionWidget extends ConsumerWidget {
             ],
           ),
           title: Text(
-              '${transaction.category.title} - ${transaction.amount.toStringAsFixed(2)} грн.'),
+              '${transaction.category.title} - ${transaction.amount.toStringAsFixed(2)} грн.',
+              style: const TextStyle(fontSize: 18)),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  '${transaction.type == 'income' ? 'Приход' : 'Расход'} - ${transaction.paymentMethod}'),
+                  '${transaction.type == 'income' ? 'Приход' : 'Расход'} - ${transaction.paymentMethod}',
+                  style: const TextStyle(fontSize: 16)),
               if (transaction.comment != null)
                 Text(
                   transaction.comment!,
