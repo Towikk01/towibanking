@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
@@ -18,11 +20,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String currentFilter = 'Все';
+  DateTime customDate = DateTime.parse('2024-12-30');
 
   void _showFilterOptions(
     BuildContext context,
     WidgetRef ref,
-    Map<String, Function> filterActions,
+    Map<String, dynamic> filterActions,
   ) {
     showCupertinoModalPopup(
       context: context,
@@ -51,27 +54,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final balance = ref.watch(balanceProvider);
     final transactions = ref.watch(transactionProvider);
+    final filterForDate = {
+      'Все': (List<Transaction> transactions) => transactions,
+      'Сегодня': (List<Transaction> transactions) => transactions
+          .where((el) =>
+              el.date.day == DateTime.now().day &&
+              el.date.month == DateTime.now().month &&
+              el.date.year == DateTime.now().year)
+          .toList(),
+      'Последние 7 дней': (List<Transaction> transactions) => transactions
+          .where((el) =>
+              el.date.isAfter(DateTime.now().subtract(const Duration(days: 7))))
+          .toList(),
+      'Последний месяц': (List<Transaction> transactions) => transactions
+          .where((el) => el.date
+              .isAfter(DateTime.now().subtract(const Duration(days: 30))))
+          .toList(),
+      'Последние полгода': (List<Transaction> transactions) => transactions
+          .where((el) => el.date
+              .isAfter(DateTime.now().subtract(const Duration(days: 180))))
+          .toList(),
+      'Последний год': (List<Transaction> transactions) => transactions
+          .where((el) => el.date
+              .isAfter(DateTime.now().subtract(const Duration(days: 365))))
+          .toList(),
+    };
     final filterActions = {
       'Только доходы': (List<Transaction> transactions) =>
           transactions.where((el) => el.type == 'income').toList(),
       'Только расходы': (List<Transaction> transactions) =>
           transactions.where((el) => el.type == 'expense').toList(),
-      'По дате': (List<Transaction> transactions) {
-        transactions.sort((a, b) => a.date.compareTo(b.date));
-        return transactions;
-      },
-      'По категории': (List<Transaction> transactions) =>
-          transactions.where((el) => el.category == 'category').toList(),
       'Все': (List<Transaction> transactions) => transactions,
     };
 
-    var filteredTransactions = filterActions[currentFilter]!(transactions);
+    var filteredTransactions =
+        filterActions[currentFilter]!(transactions) ?? transactions;
+    var dateTransaction = filterForDate[currentFilter]!(filteredTransactions) ??
+        filteredTransactions;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        border: Border(
-            bottom:
-                const BorderSide(color: CupertinoColors.separator, width: 1)),
+        border: const Border(
+            bottom: BorderSide(color: CupertinoColors.separator, width: 1)),
         middle:
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           Column(
@@ -79,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const Text(
                 'Наличные:',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -131,9 +155,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(top: 10.0),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -146,6 +169,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       if (transactions.isNotEmpty)
                         CupertinoButton(
+                          alignment: Alignment.bottomLeft,
+                          sizeStyle: CupertinoButtonSize.medium,
                           borderRadius: BorderRadius.zero,
                           child: const Icon(CupertinoIcons.list_bullet_indent),
                           onPressed: () => _showFilterOptions(
@@ -156,6 +181,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                     ],
                   ),
+                ),
+                if (filteredTransactions.isNotEmpty)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 0,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: filterForDate.entries.map((entry) {
+                        return CupertinoButton(
+                          sizeStyle: CupertinoButtonSize.medium,
+                          child: Text(entry.key,
+                              style: const TextStyle(color: AppColors.mint)),
+                          onPressed: () {
+                            setState(() {
+                              filteredTransactions = entry.value(transactions);
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                const SizedBox(height: 5),
+                if (filteredTransactions.isNotEmpty)
+                  SizedBox(
+                    height: 35,
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.date,
+                      initialDateTime: DateTime.now(),
+                      onDateTimeChanged: (DateTime newDate) {
+                        customDate = newDate;
+                      },
+                    ),
+                  ),
+                const SizedBox(
+                  height: 15,
                 ),
                 transactions.isNotEmpty
                     ? Expanded(
