@@ -87,10 +87,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'Все': (List<Transaction> transactions) => transactions,
     };
 
-    var filteredTransactions =
-        filterActions[currentFilter]!(transactions) ?? transactions;
-    var dateTransaction = filterForDate[currentFilter]!(filteredTransactions) ??
-        filteredTransactions;
+    var filteredTransactions = filterActions[currentFilter]!(transactions);
+    // var dateTransaction = filterForDate[currentFilter]!(filteredTransactions) ??
+    //     filteredTransactions;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(

@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:towibanking/core/models/category.dart';
 
-// Define default categories
 final defaultCategories = [
   Category(title: 'Питание', icon: Icons.fastfood, id: 'food', type: 'expense'),
   Category(title: 'Дом', icon: Icons.home, id: 'home', type: 'expense'),
@@ -87,15 +89,36 @@ final defaultCategories = [
 class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
   UnifiedCategoryNotifier(super.state);
 
+  Future<void> loadCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    final categoriesString = prefs.getString('categories');
+    if (categoriesString != null) {
+      final categoriesList = json.decode(categoriesString) as List;
+      state = categoriesList
+          .map((categoryJson) => Category.fromJson(categoryJson))
+          .toList();
+    } else {
+      state = defaultCategories;
+    }
+  }
+
+  Future<void> saveCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    final categoriesJson = state.map((cat) => cat.toJson()).toList();
+    await prefs.setString('categories', json.encode(categoriesJson));
+  }
+
   void addCategory(Category category) {
     state = [
       category,
       ...state,
     ];
+    saveCategories();
   }
 
-  void removeCategory(String id) {
-    state = state.where((cat) => cat.id != id).toList();
+  void removeCategory(String title) {
+    state = state.where((cat) => cat.title != title).toList();
+    saveCategories();
   }
 
   void editCategory(Category updatedCategory) {
@@ -111,7 +134,7 @@ class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
 
 final unifiedCategoriesProvider =
     StateNotifierProvider<UnifiedCategoryNotifier, List<Category>>((ref) {
-  return UnifiedCategoryNotifier(defaultCategories);
+  return UnifiedCategoryNotifier(defaultCategories)..loadCategories();
 });
 
 final incomeCategoriesProvider = Provider<List<Category>>((ref) {

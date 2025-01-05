@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/widgets/categories_dialog.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -37,8 +38,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     CupertinoIcons.xmark
   ];
 
-  final Category form =
-      Category(title: '', icon: null, id: '', type: 'expense');
+  Category form = Category(title: '', icon: null, id: '', type: 'expense');
 
   void _addCategory() {
     final notifier = ref.read(unifiedCategoriesProvider.notifier);
@@ -80,94 +80,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 showCupertinoDialog(
                   context: context,
                   builder: (_) {
-                    return CupertinoAlertDialog(
-                      title: const Text("Добавить категорию",
-                          style: TextStyle(fontSize: 20)),
-                      content: Container(
-                        margin: const EdgeInsets.only(top: 10),
-                        child: Column(
-                          spacing: 10,
-                          children: [
-                            CupertinoTextField(
-                              style: const TextStyle(fontSize: 20),
-                              padding: const EdgeInsets.all(14),
-                              placeholder: "Название категории",
-                              onChanged: (value) {
-                                setState(() {
-                                  form.title = value;
-                                });
-                              },
-                            ),
-                            CupertinoSegmentedControl<String>(
-                              padding: const EdgeInsets.all(10),
-                              children: {
-                                'expense': Container(
-                                    padding: const EdgeInsets.all(10),
-                                    child: const Text('Расход',
-                                        style: TextStyle(fontSize: 20))),
-                                'income': Container(
-                                    padding: const EdgeInsets.all(10),
-                                    child: const Text('Приход',
-                                        style: TextStyle(fontSize: 20))),
-                              },
-                              onValueChanged: (value) {
-                                setState(() {
-                                  form.type = value;
-                                  print('Selected type: $value');
-                                });
-                              },
-                              groupValue: form.type,
-                            ),
-                            SizedBox(
-                              height: 50,
-                              child: CupertinoPicker(
-                                itemExtent: 50,
-                                onSelectedItemChanged: (int index) {
-                                  setState(() {
-                                    form.icon = cupertinoIcons[index];
-                                  });
-                                },
-                                children: cupertinoIcons
-                                    .map((icon) => Icon(icon))
-                                    .toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: const Text("Отмена"),
-                          onPressed: () {
-                            Navigator.of(context, rootNavigator: false).pop();
-                          },
-                        ),
-                        CupertinoDialogAction(
-                          child: const Text("Добавить"),
-                          onPressed: () {
-                            if (form.title.isNotEmpty && form.icon != null) {
-                              _addCategory();
-                              Navigator.of(context, rootNavigator: false).pop();
-                            } else {
-                              showCupertinoDialog(
-                                context: context,
-                                builder: (context) => CupertinoAlertDialog(
-                                  title: const Text("Ошибка"),
-                                  content: const Text("Заполните все поля"),
-                                  actions: [
-                                    CupertinoDialogAction(
-                                      child: const Text("OK"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ],
+                    return CategoriesDialog(
+                      form: form,
+                      cupertinoIcons: cupertinoIcons,
+                      add: _addCategory,
                     );
                   },
                 );

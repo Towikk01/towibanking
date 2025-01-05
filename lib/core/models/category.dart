@@ -8,19 +8,16 @@ class Category {
 
   Category({required this.title, this.icon, this.id, this.type});
 
-  Map<String, dynamic> toJson() => {
-        'title': title,
-        'icon': icon?.codePoint,
-        'id': id,
-      };
+  Map<String, dynamic> toJson() =>
+      {'title': title, 'icon': icon?.codePoint, 'id': id, "type": type};
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      title: json['title'],
-      icon: json['icon'] != null
-          ? IconData(json['icon'], fontFamily: 'MaterialIcons')
-          : null,
-      id: json['id'],
-    );
+        title: json['title'],
+        icon: json['icon'] != null
+            ? IconData(json['icon'], fontFamily: 'MaterialIcons')
+            : null,
+        id: json['id'],
+        type: json['type']);
   }
 }
