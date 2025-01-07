@@ -1,15 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
-import 'package:towibanking/core/models/transaction_form.dart';
+
 import 'package:towibanking/core/riverpod/balance.dart';
-import 'package:towibanking/core/riverpod/category.dart';
+
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
-import 'package:towibanking/core/widgets/transaction_dialog.dart';
-import 'package:towibanking/core/widgets/transaction_widget.dart';
+
+import 'package:towibanking/core/widgets/slidable_transaction.dart';
+import 'package:towibanking/core/helpers/functions.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,35 +19,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String currentFilter = 'Все';
+  String filterByDate = 'Все';
   DateTime customDate = DateTime.parse('2024-12-30');
-
-  void _showFilterOptions(
-    BuildContext context,
-    WidgetRef ref,
-    Map<String, dynamic> filterActions,
-  ) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (_) => CupertinoActionSheet(
-        title: const Text('Фильтровать по:'),
-        actions: filterActions.entries
-            .map((entry) => CupertinoActionSheetAction(
-                  onPressed: () {
-                    setState(() {
-                      currentFilter = entry.key;
-                    });
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                  child: Text(entry.key),
-                ))
-            .toList(),
-        cancelButton: CupertinoActionSheetAction(
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-          child: const Text('Отмена'),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,8 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     };
 
     var filteredTransactions = filterActions[currentFilter]!(transactions);
-    // var dateTransaction = filterForDate[currentFilter]!(filteredTransactions) ??
-    //     filteredTransactions;
+    filteredTransactions = filterForDate[filterByDate]!(filteredTransactions);
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -134,7 +105,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const Text(
                 'Общий:',
-                style: const TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               Text(
@@ -172,11 +143,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           sizeStyle: CupertinoButtonSize.medium,
                           borderRadius: BorderRadius.zero,
                           child: const Icon(CupertinoIcons.list_bullet_indent),
-                          onPressed: () => _showFilterOptions(
-                            context,
-                            ref,
-                            filterActions,
-                          ),
+                          onPressed: () => showFilterOptions(
+                              context, ref, filterActions, (String newFilter) {
+                            setState(() {
+                              currentFilter = newFilter;
+                            });
+                          }),
                         ),
                     ],
                   ),
@@ -194,7 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               style: const TextStyle(color: AppColors.mint)),
                           onPressed: () {
                             setState(() {
-                              filteredTransactions = entry.value(transactions);
+                              filterByDate = entry.key;
                             });
                           },
                         );
@@ -241,56 +213,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: const EdgeInsets.all(16),
               child: const Icon(CupertinoIcons.add),
               onPressed: () {
-                _showTransactionDialog(context, ref);
+                showTransactionDialog(context, ref);
               },
             ),
           ),
         ],
       ),
-    );
-  }
-
-  void _showTransactionDialog(BuildContext context, WidgetRef ref) {
-    final TransactionForm transactionForm = TransactionForm(
-        transactionType: 'income',
-        paymentMethod: 'Наличные',
-        selectedCategory: defaultCategories.first,
-        date: DateTime.now(),
-        amount: 0);
-
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: const Text('Добавить транзакцию'),
-          content: TransactionDialogContent(transactionForm: transactionForm),
-          actions: [
-            CupertinoDialogAction(
-              child: const Text('Отмена'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            CupertinoDialogAction(
-              child: const Text('Добавить'),
-              onPressed: () {
-                if (transactionForm.amount <= 0) return;
-                ref
-                    .read(transactionProvider.notifier)
-                    .addTransaction(transactionForm.toTransaction());
-                if (transactionForm.transactionType == 'income') {
-                  ref.read(balanceProvider.notifier).addMoney(
-                      transactionForm.amount, transactionForm.paymentMethod);
-                } else if (transactionForm.transactionType == 'expense') {
-                  ref.read(balanceProvider.notifier).removeMoney(
-                      transactionForm.amount, transactionForm.paymentMethod);
-                }
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      },
     );
   }
 }

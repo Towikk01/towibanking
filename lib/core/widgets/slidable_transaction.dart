@@ -50,7 +50,7 @@ class TransactionWidget extends ConsumerWidget {
               : CupertinoColors.systemGrey6,
         ),
         child: CupertinoListTile(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           leading: Icon(
             color: transaction.type == 'income'
                 ? CupertinoColors.systemBlue

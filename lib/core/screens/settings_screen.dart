@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/riverpod/category.dart';
-import 'package:towibanking/core/widgets/categories_dialog.dart';
+import 'package:towibanking/core/widgets/add_category.dart';
+import 'package:towibanking/core/widgets/remove_category.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -38,7 +39,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     CupertinoIcons.xmark
   ];
 
-  Category form = Category(title: '', icon: null, id: '', type: 'expense');
+  late Category form;
+
+  @override
+  void initState() {
+    super.initState();
+    form = Category(
+        title: '', icon: cupertinoIcons.first, id: '', type: 'expense');
+  }
 
   void _addCategory() {
     final notifier = ref.read(unifiedCategoriesProvider.notifier);
@@ -85,6 +93,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       cupertinoIcons: cupertinoIcons,
                       add: _addCategory,
                     );
+                  },
+                );
+              },
+            ),
+          ),
+          CupertinoListTile(
+            title: const Text("Удалить категорию"),
+            trailing: CupertinoButton(
+              child: const Text("-"),
+              onPressed: () {
+                showCupertinoDialog(
+                  context: context,
+                  builder: (_) {
+                    return const RemoveCategory();
                   },
                 );
               },

@@ -24,6 +24,7 @@ class TransactionDialogContentState
     final currentCategories = widget.transactionForm.transactionType == 'income'
         ? categories.where((el) => el.type == 'income').toList()
         : categories.where((el) => el.type == 'expense').toList();
+    print(categories.where((el) => el.type == 'income').toList());
 
     return Column(
       mainAxisSize: MainAxisSize.min,

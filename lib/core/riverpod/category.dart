@@ -46,9 +46,6 @@ final defaultCategories = [
       id: 'subs',
       type: 'expense'),
   Category(title: 'Кафе', icon: Icons.local_cafe, id: 'cafe', type: 'expense'),
-  Category(title: "Зарплата", icon: Icons.money, id: 'salary', type: 'income'),
-  Category(
-      title: "Другое", icon: Icons.attach_money, id: 'other', type: 'income'),
   Category(
       title: "Подарки",
       icon: Icons.card_giftcard_sharp,
@@ -59,7 +56,6 @@ final defaultCategories = [
       icon: Icons.account_balance_wallet,
       id: 'debt',
       type: 'income'),
-  Category(title: "Чаевые", icon: Icons.money_off, id: 'tips', type: 'income'),
   Category(
       title: 'Образование',
       icon: Icons.school,
@@ -84,6 +80,10 @@ final defaultCategories = [
       title: 'Косметика', icon: Icons.brush, id: 'cosmetics', type: 'expense'),
   Category(
       title: 'Игры', icon: Icons.videogame_asset, id: 'games', type: 'expense'),
+  Category(title: "Зарплата", icon: Icons.money, id: 'salary', type: 'income'),
+  Category(
+      title: "Другое", icon: Icons.attach_money, id: 'other', type: 'income'),
+  Category(title: "Чаевые", icon: Icons.money_off, id: 'tips', type: 'income'),
 ];
 
 class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
@@ -116,19 +116,12 @@ class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
     saveCategories();
   }
 
-  void removeCategory(String title) {
-    state = state.where((cat) => cat.title != title).toList();
+  void removeCategory(Category category) {
+    state = state
+        .where((cat) =>
+            !(cat.title == category.title && cat.type == category.type))
+        .toList();
     saveCategories();
-  }
-
-  void editCategory(Category updatedCategory) {
-    state = state.map((cat) {
-      return cat.id == updatedCategory.id ? updatedCategory : cat;
-    }).toList();
-  }
-
-  List<Category> filterByType(String type) {
-    return state.where((cat) => cat.type == type).toList();
   }
 }
 
@@ -147,6 +140,6 @@ final incomeCategoriesProvider = Provider<List<Category>>((ref) {
 final spendingCategoriesProvider = Provider<List<Category>>((ref) {
   return ref
       .watch(unifiedCategoriesProvider)
-      .where((cat) => cat.type == 'spend')
+      .where((cat) => cat.type == 'expense')
       .toList();
 });
