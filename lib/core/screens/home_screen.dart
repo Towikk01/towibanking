@@ -28,6 +28,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final transactions = ref.watch(transactionProvider);
     final filterForDate = {
       'Все': (List<Transaction> transactions) => transactions,
+      'Выбранная дата': (List<Transaction> transactions) => transactions
+          .where((el) =>
+              el.date.day == customDate.day &&
+              el.date.month == customDate.month &&
+              el.date.year == customDate.year)
+          .toList(),
       'Сегодня': (List<Transaction> transactions) => transactions
           .where((el) =>
               el.date.day == DateTime.now().day &&
@@ -73,14 +79,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const Text(
                 'Наличные:',
-                style: TextStyle(
-                  fontSize: 16,
-                ),
+                style: TextStyle(fontSize: 16, color: AppColors.lightCream),
                 textAlign: TextAlign.center,
               ),
               Text(
                 '${balance.cash}',
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16, color: AppColors.orange),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -90,12 +94,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const Text(
                 'Карта:',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: AppColors.lightCream),
                 textAlign: TextAlign.center,
               ),
               Text(
                 '${balance.card}',
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16, color: AppColors.orange),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -105,12 +109,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const Text(
                 'Общий:',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: AppColors.lightCream),
                 textAlign: TextAlign.center,
               ),
               Text(
                 '${balance.cash + balance.card}',
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16, color: AppColors.orange),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -125,7 +129,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
+                  padding: const EdgeInsets.only(top: 4.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,7 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const Expanded(
                         child: Text(
                           'Последние транзакции',
-                          style: TextStyle(fontSize: 22),
+                          style: TextStyle(fontSize: 26),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -153,7 +157,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ],
                   ),
                 ),
-                if (filteredTransactions.isNotEmpty)
+                if (transactions.isNotEmpty)
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -163,7 +167,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         return CupertinoButton(
                           sizeStyle: CupertinoButtonSize.medium,
                           child: Text(entry.key,
-                              style: const TextStyle(color: AppColors.mint)),
+                              style: TextStyle(
+                                  color: filterByDate == entry.key
+                                      ? AppColors.lightCream
+                                      : AppColors.secondary)),
                           onPressed: () {
                             setState(() {
                               filterByDate = entry.key;
@@ -174,34 +181,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                 const SizedBox(height: 5),
-                if (filteredTransactions.isNotEmpty)
-                  SizedBox(
-                    height: 35,
-                    child: CupertinoDatePicker(
-                      mode: CupertinoDatePickerMode.date,
-                      initialDateTime: DateTime.now(),
-                      onDateTimeChanged: (DateTime newDate) {
-                        customDate = newDate;
-                      },
+                if (transactions.isNotEmpty)
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.orange),
+                    height: 50,
+                    width: 300,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CupertinoDatePicker(
+                        itemExtent: 50,
+                        backgroundColor: AppColors.orange,
+                        mode: CupertinoDatePickerMode.date,
+                        initialDateTime: DateTime.now(),
+                        onDateTimeChanged: (DateTime newDate) {
+                          customDate = newDate;
+                        },
+                      ),
                     ),
                   ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
-                transactions.isNotEmpty
+                filteredTransactions.isNotEmpty
                     ? Expanded(
-                        child: ListView.separated(
-                          separatorBuilder: (context, index) => Container(
-                              height: 1, color: CupertinoColors.black),
-                          itemCount: filteredTransactions.length,
-                          itemBuilder: (context, index) {
-                            final transaction = filteredTransactions[index];
-                            return TransactionWidget(transaction: transaction);
-                          },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) => Container(
+                              height: 8,
+                              color: CupertinoColors.transparent,
+                            ),
+                            itemCount: filteredTransactions.length,
+                            itemBuilder: (context, index) {
+                              final transaction = filteredTransactions[index];
+                              return TransactionWidget(
+                                  transaction: transaction);
+                            },
+                          ),
                         ),
                       )
-                    : const Text('Еще нет транзакций...',
-                        style: TextStyle(fontSize: 16))
+                    : transactions.isNotEmpty
+                        ? const Text('Нет транзакций по фильтру...',
+                            style: TextStyle(
+                                fontSize: 24, color: AppColors.orange))
+                        : const Text('Еще нет транзакций...',
+                            style: TextStyle(
+                                fontSize: 24, color: AppColors.orange))
               ],
             ),
           ),
@@ -211,7 +238,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: CupertinoButton.filled(
               borderRadius: BorderRadius.circular(30),
               padding: const EdgeInsets.all(16),
-              child: const Icon(CupertinoIcons.add),
+              child: const Icon(
+                CupertinoIcons.add,
+                color: AppColors.lightCream,
+              ),
               onPressed: () {
                 showTransactionDialog(context, ref);
               },
