@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
+import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/riverpod/currency.dart';
 import 'package:towibanking/core/widgets/add_category.dart';
 import 'package:towibanking/core/widgets/remove_category.dart';
 
@@ -13,30 +16,22 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final List<IconData> cupertinoIcons = [
-    CupertinoIcons.add,
-    CupertinoIcons.airplane,
-    CupertinoIcons.alarm,
-    CupertinoIcons.arrow_down,
-    CupertinoIcons.arrow_up,
-    CupertinoIcons.book,
-    CupertinoIcons.calendar,
-    CupertinoIcons.camera,
-    CupertinoIcons.chat_bubble,
-    CupertinoIcons.check_mark,
-    CupertinoIcons.heart,
-    CupertinoIcons.home,
-    CupertinoIcons.mail,
-    CupertinoIcons.map,
-    CupertinoIcons.music_note,
-    CupertinoIcons.person,
-    CupertinoIcons.search,
-    CupertinoIcons.settings,
-    CupertinoIcons.shopping_cart,
-    CupertinoIcons.trash,
-    CupertinoIcons.video_camera,
-    CupertinoIcons.volume_up,
-    CupertinoIcons.xmark
+  final List<IconData> icons = [
+    Icons.add,
+    Icons.remove,
+    Icons.food_bank,
+    Icons.access_alarm,
+    Icons.accessibility,
+    Icons.account_balance_wallet,
+    Icons.account_circle,
+    Icons.account_tree,
+    Icons.catching_pokemon,
+    Icons.cake,
+    Icons.calendar_today,
+    Icons.camera,
+    Icons.campaign,
+    Icons.cancel,
+    Icons.call,
   ];
 
   late Category form;
@@ -44,20 +39,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    form = Category(
-        title: '', icon: cupertinoIcons.first, id: '', type: 'expense');
+    form = Category(title: '', icon: icons.first, id: '', type: 'expense');
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.read(unifiedCategoriesProvider.notifier);
+    final categories = ref.watch(unifiedCategoriesProvider.notifier);
+    final balance = ref.watch(balanceProvider.notifier);
+    final transactions = ref.watch(balanceProvider.notifier);
+    final currency = ref.watch(currencyProvider.notifier);
     void addCategory() {
       final newCategory = Category(
           title: form.title,
           icon: form.icon,
           id: DateTime.now().toIso8601String(),
           type: form.type);
-      notifier.addCategory(newCategory);
+      categories.addCategory(newCategory);
     }
 
     return CupertinoPageScaffold(
@@ -90,7 +87,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   builder: (_) {
                     return CategoriesDialog(
                       form: form,
-                      cupertinoIcons: cupertinoIcons,
+                      icons: icons,
                       add: addCategory,
                     );
                   },
@@ -117,7 +114,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               "Очистить все данные",
               style: TextStyle(color: CupertinoColors.destructiveRed),
             ),
-            onTap: () {},
+            onTap: () {
+              balance.reset();
+              transactions.reset();
+              categories.reset();
+              currency.reset();
+            },
           ),
         ],
       ),

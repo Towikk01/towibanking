@@ -64,4 +64,11 @@ class BalanceNotifier extends StateNotifier<Balance> {
     }
     saveBalance();
   }
+
+  void reset() async {
+    state = state.copyWith(cash: 0.0, card: 0.0);
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    saveBalance();
+  }
 }

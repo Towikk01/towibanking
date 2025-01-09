@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/theme/app_colors.dart';
 
 class TransactionDialogContent extends ConsumerStatefulWidget {
   final TransactionForm transactionForm;
@@ -85,7 +86,7 @@ class TransactionDialogContentState
                 DateTime tempPickedDate = form.date!;
                 return Container(
                   height: 250,
-                  color: CupertinoColors.white,
+                  color: CupertinoColors.black,
                   child: Column(
                     children: [
                       SizedBox(
@@ -132,7 +133,7 @@ class TransactionDialogContentState
         CupertinoTextField(
           padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.number,
-          placeholder: 'Хау мач',
+          placeholder: 'Введите сумму',
           onChanged: (value) {
             form.amount = double.tryParse(value) ?? 0;
           },

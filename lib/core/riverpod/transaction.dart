@@ -66,4 +66,11 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     }
     saveTransactions();
   }
+
+  void reset() async {
+    state = [];
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    await saveTransactions();
+  }
 }

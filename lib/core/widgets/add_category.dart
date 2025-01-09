@@ -2,16 +2,14 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
+import 'package:towibanking/core/riverpod/category.dart';
 
 class CategoriesDialog extends ConsumerStatefulWidget {
   final Category form;
-  final List<IconData> cupertinoIcons;
+  final List<IconData> icons;
   final VoidCallback add;
   const CategoriesDialog(
-      {super.key,
-      required this.cupertinoIcons,
-      required this.form,
-      required this.add});
+      {super.key, required this.icons, required this.form, required this.add});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -21,7 +19,7 @@ class CategoriesDialog extends ConsumerStatefulWidget {
 class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
   @override
   Widget build(BuildContext context) {
-    
+    final categories = ref.watch(unifiedCategoriesProvider);
     return CupertinoAlertDialog(
       title: const Text("Добавить категорию", style: TextStyle(fontSize: 20)),
       content: Container(
@@ -68,11 +66,10 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
                 itemExtent: 50,
                 onSelectedItemChanged: (int index) {
                   setState(() {
-                    widget.form.icon = widget.cupertinoIcons[index];
+                    widget.form.icon = widget.icons[index];
                   });
                 },
-                children:
-                    widget.cupertinoIcons.map((icon) => Icon(icon)).toList(),
+                children: widget.icons.map((icon) => Icon(icon)).toList(),
               ),
             ),
           ],
@@ -88,6 +85,25 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
         CupertinoDialogAction(
           child: const Text("Добавить"),
           onPressed: () {
+            if (categories.any((el) =>
+                el.title == widget.form.title && el.type == widget.form.type)) {
+              showCupertinoDialog(
+                context: context,
+                builder: (context) => CupertinoAlertDialog(
+                  title: const Text("Ошибка"),
+                  content: const Text("Категория уже существует"),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: const Text("OK"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              );
+              return;
+            }
             if (widget.form.title.isNotEmpty && widget.form.icon != null) {
               widget.add();
               Navigator.of(context, rootNavigator: true).pop();

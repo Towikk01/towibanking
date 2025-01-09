@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,11 +52,6 @@ final defaultCategories = [
       id: 'gift',
       type: 'expense'),
   Category(
-      title: "Долг",
-      icon: Icons.account_balance_wallet,
-      id: 'debt',
-      type: 'income'),
-  Category(
       title: 'Образование',
       icon: Icons.school,
       id: 'education',
@@ -82,9 +76,14 @@ final defaultCategories = [
   Category(
       title: 'Игры', icon: Icons.videogame_asset, id: 'games', type: 'expense'),
   Category(title: "Зарплата", icon: Icons.money, id: 'salary', type: 'income'),
+  Category(title: "Чаевые", icon: Icons.money_off, id: 'tips', type: 'income'),
+  Category(
+      title: "Долг",
+      icon: Icons.account_balance_wallet,
+      id: 'debt',
+      type: 'income'),
   Category(
       title: "Другое", icon: Icons.attach_money, id: 'other', type: 'income'),
-  Category(title: "Чаевые", icon: Icons.money_off, id: 'tips', type: 'income'),
 ];
 
 final unifiedCategoriesProvider =
@@ -129,6 +128,13 @@ class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
         .where((cat) =>
             !(cat.title == category.title && cat.type == category.type))
         .toList();
+    await saveCategories();
+  }
+
+  void reset() async {
+    state = [...defaultCategories];
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
     await saveCategories();
   }
 }

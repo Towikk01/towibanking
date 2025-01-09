@@ -12,7 +12,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +24,12 @@ class MyApp extends StatelessWidget {
       ],
       debugShowCheckedModeBanner: false,
       theme: CupertinoThemeData(
-          brightness: Brightness.light,
+          brightness: Brightness.dark,
           primaryColor: AppColors.orange,
           barBackgroundColor: AppColors.black,
           scaffoldBackgroundColor: AppColors.black,
           textTheme: CupertinoTextThemeData(
-            textStyle: TextStyle(color: AppColors.orange),
+            textStyle: TextStyle(color: AppColors.orange, fontSize: 18),
             primaryColor: CupertinoColors.black,
           )),
       home: TabBar(),

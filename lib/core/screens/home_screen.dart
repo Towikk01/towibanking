@@ -21,7 +21,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String currentFilter = 'Все';
   String filterByDate = 'Все';
-  DateTime customDate = DateTime.parse('2024-12-30');
+  DateTime customDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
