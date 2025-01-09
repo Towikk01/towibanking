@@ -1,16 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
-import 'package:towibanking/core/riverpod/category.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/widgets/add_transaction.dart';
 
-void showTransactionDialog(BuildContext context, WidgetRef ref) {
+void showTransactionDialog(
+    BuildContext context, WidgetRef ref, List<Category> categories) {
+  final currentCategories =
+      categories.where((el) => el.type == 'expense').toList();
+
   final TransactionForm transactionForm = TransactionForm(
-      transactionType: 'income',
+      transactionType: 'expense',
       paymentMethod: 'Наличные',
-      selectedCategory: defaultCategories.first,
+      selectedCategory: currentCategories.first,
       date: DateTime.now(),
       amount: 0);
 

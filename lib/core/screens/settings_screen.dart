@@ -48,18 +48,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         title: '', icon: cupertinoIcons.first, id: '', type: 'expense');
   }
 
-  void _addCategory() {
-    final notifier = ref.read(unifiedCategoriesProvider.notifier);
-    notifier.addCategory(Category(
-      title: form.title,
-      icon: form.icon,
-      id: DateTime.now().toIso8601String(),
-      type: form.type,
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
+    final notifier = ref.read(unifiedCategoriesProvider.notifier);
+    void addCategory() {
+      final newCategory = Category(
+          title: form.title,
+          icon: form.icon,
+          id: DateTime.now().toIso8601String(),
+          type: form.type);
+      notifier.addCategory(newCategory);
+    }
+
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text("Настройки"),
@@ -91,7 +91,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     return CategoriesDialog(
                       form: form,
                       cupertinoIcons: cupertinoIcons,
-                      add: _addCategory,
+                      add: addCategory,
                     );
                   },
                 );

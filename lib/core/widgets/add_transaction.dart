@@ -21,10 +21,9 @@ class TransactionDialogContentState
   Widget build(BuildContext context) {
     final form = widget.transactionForm;
     final categories = ref.watch(unifiedCategoriesProvider);
-    final currentCategories = widget.transactionForm.transactionType == 'income'
-        ? categories.where((el) => el.type == 'income').toList()
-        : categories.where((el) => el.type == 'expense').toList();
-    print(categories.where((el) => el.type == 'income').toList());
+    final currentCategories =
+        categories.where((el) => el.type == form.transactionType).toList();
+    // print(categories.where((el) => el.type == 'income').toList());
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -45,9 +44,10 @@ class TransactionDialogContentState
           onValueChanged: (value) {
             setState(() {
               form.transactionType = value;
-              form.selectedCategory = form.transactionType == 'income'
-                  ? defaultCategories.where((el) => el.type == 'income').first
-                  : defaultCategories.where((el) => el.type == 'expense').first;
+              form.selectedCategory = categories
+                  .where(
+                      (el) => el.type == widget.transactionForm.transactionType)
+                  .first;
             });
           },
           groupValue: form.transactionType,

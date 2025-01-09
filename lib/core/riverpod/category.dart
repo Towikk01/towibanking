@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,6 +87,13 @@ final defaultCategories = [
   Category(title: "Чаевые", icon: Icons.money_off, id: 'tips', type: 'income'),
 ];
 
+final unifiedCategoriesProvider =
+    StateNotifierProvider<UnifiedCategoryNotifier, List<Category>>((ref) {
+  final notifier = UnifiedCategoryNotifier(defaultCategories);
+  notifier.loadCategories();
+  return notifier;
+});
+
 class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
   UnifiedCategoryNotifier(super.state);
 
@@ -98,7 +106,7 @@ class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
           .map((categoryJson) => Category.fromJson(categoryJson))
           .toList();
     } else {
-      state = defaultCategories;
+      state = [...defaultCategories];
     }
   }
 
@@ -108,38 +116,19 @@ class UnifiedCategoryNotifier extends StateNotifier<List<Category>> {
     await prefs.setString('categories', json.encode(categoriesJson));
   }
 
-  void addCategory(Category category) {
+  void addCategory(Category category) async {
     state = [
       category,
       ...state,
     ];
-    saveCategories();
+    await saveCategories();
   }
 
-  void removeCategory(Category category) {
+  void removeCategory(Category category) async {
     state = state
         .where((cat) =>
             !(cat.title == category.title && cat.type == category.type))
         .toList();
-    saveCategories();
+    await saveCategories();
   }
 }
-
-final unifiedCategoriesProvider =
-    StateNotifierProvider<UnifiedCategoryNotifier, List<Category>>((ref) {
-  return UnifiedCategoryNotifier(defaultCategories)..loadCategories();
-});
-
-final incomeCategoriesProvider = Provider<List<Category>>((ref) {
-  return ref
-      .watch(unifiedCategoriesProvider)
-      .where((cat) => cat.type == 'income')
-      .toList();
-});
-
-final spendingCategoriesProvider = Provider<List<Category>>((ref) {
-  return ref
-      .watch(unifiedCategoriesProvider)
-      .where((cat) => cat.type == 'expense')
-      .toList();
-});

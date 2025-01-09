@@ -28,4 +28,9 @@ class TransactionForm {
       comment: comment.isEmpty ? null : comment,
     );
   }
+
+  @override
+  String toString() {
+    return 'TransactionForm{transactionType: $transactionType, paymentMethod: $paymentMethod, selectedCategory: $selectedCategory, amount: $amount, comment: $comment, date: $date}';
+  }
 }

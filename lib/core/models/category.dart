@@ -20,4 +20,8 @@ class Category {
         id: json['id'],
         type: json['type']);
   }
+  @override
+  String toString() {
+    return 'Category{title: $title, icon: $icon, id: $id, type: $type}';
+  }
 }

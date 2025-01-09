@@ -21,6 +21,7 @@ class CategoriesDialog extends ConsumerStatefulWidget {
 class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
   @override
   Widget build(BuildContext context) {
+    
     return CupertinoAlertDialog(
       title: const Text("Добавить категорию", style: TextStyle(fontSize: 20)),
       content: Container(
