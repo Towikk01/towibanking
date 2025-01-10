@@ -36,13 +36,13 @@ void showTransactionDialog(
             onPressed: () {
               if (transactionForm.amount <= 0) return;
               ref
-                  .read(transactionProvider.notifier)
+                  .watch(transactionProvider.notifier)
                   .addTransaction(transactionForm.toTransaction());
               if (transactionForm.transactionType == 'income') {
-                ref.read(balanceProvider.notifier).addMoney(
+                ref.watch(balanceProvider.notifier).addMoney(
                     transactionForm.amount, transactionForm.paymentMethod);
               } else if (transactionForm.transactionType == 'expense') {
-                ref.read(balanceProvider.notifier).removeMoney(
+                ref.watch(balanceProvider.notifier).removeMoney(
                     transactionForm.amount, transactionForm.paymentMethod);
               }
               Navigator.of(context).pop();

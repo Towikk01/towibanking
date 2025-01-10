@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
+import 'package:towibanking/core/riverpod/currency.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:intl/intl.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
@@ -18,15 +19,18 @@ class TransactionWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currency = ref.watch(currencyProvider.notifier).selectedCurrency;
+    print(currency);
+
     void removeTransaction() {
-      ref.read(transactionProvider.notifier).removeTransaction(transaction);
+      ref.watch(transactionProvider.notifier).removeTransaction(transaction);
       if (transaction.type == 'income') {
         ref
-            .read(balanceProvider.notifier)
+            .watch(balanceProvider.notifier)
             .removeMoney(transaction.amount, transaction.paymentMethod);
       } else if (transaction.type == 'expense') {
         ref
-            .read(balanceProvider.notifier)
+            .watch(balanceProvider.notifier)
             .addMoney(transaction.amount, transaction.paymentMethod);
       }
     }
@@ -87,7 +91,7 @@ class TransactionWidget extends ConsumerWidget {
               Text('${transaction.category.title} - ',
                   style: const TextStyle(
                       fontSize: 18, color: AppColors.lightCream)),
-              Text('${transaction.amount.toStringAsFixed(2)}грн.',
+              Text('${transaction.amount.toStringAsFixed(2)} ${currency}.',
                   style: const TextStyle(fontSize: 18)),
             ],
           ),

@@ -60,9 +60,9 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     addTransaction(transaction);
 
     if (transactionType == 'income') {
-      ref.read(balanceProvider.notifier).addMoney(amount, paymentMethod);
+      ref.watch(balanceProvider.notifier).addMoney(amount, paymentMethod);
     } else if (transactionType == 'expense') {
-      ref.read(balanceProvider.notifier).removeMoney(amount, paymentMethod);
+      ref.watch(balanceProvider.notifier).removeMoney(amount, paymentMethod);
     }
     saveTransactions();
   }

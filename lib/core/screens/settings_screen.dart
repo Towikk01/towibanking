@@ -47,7 +47,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final categories = ref.watch(unifiedCategoriesProvider.notifier);
     final balance = ref.watch(balanceProvider.notifier);
     final transactions = ref.watch(balanceProvider.notifier);
-    final currency = ref.watch(currencyProvider.notifier);
+    var selectedCurrency =
+        ref.watch(currencyProvider.notifier).selectedCurrency;
+    final currencyNotifier = ref.watch(currencyProvider.notifier);
+    var selectedKey = currencies.keys.toList()[0];
+
     void addCategory() {
       final newCategory = Category(
           title: form.title,
@@ -73,8 +77,56 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           CupertinoListTile(
             title: const Text("Валюта"),
             trailing: CupertinoButton(
-              child: const Text("UAH"),
-              onPressed: () {},
+              child: Text(selectedCurrency),
+              onPressed: () {
+                showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return CupertinoAlertDialog(
+                          title: const Text('Выберите валюту'),
+                          content: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            spacing: 20,
+                            children: [
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              SizedBox(
+                                height: 50,
+                                child: CupertinoPicker(
+                                  itemExtent: 50,
+                                  onSelectedItemChanged: (int index) {
+                                    selectedKey =
+                                        currencies.keys.toList()[index];
+                                  },
+                                  children: currencies.keys
+                                      .map((key) => Center(
+                                            child: Text(
+                                              "$key (${currencies[key]})",
+                                              textAlign: TextAlign.center,
+                                              style:
+                                                  const TextStyle(fontSize: 20),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                              ),
+                              CupertinoButton(
+                                sizeStyle: CupertinoButtonSize.small,
+                                child: const Text('Выбрать'),
+                                onPressed: () {
+                                  setState(() {
+                                    selectedCurrency = currencies[selectedKey]!;
+                                  });
+                                  currencyNotifier.changeCurrency(selectedKey);
+                                  Navigator.pop(context);
+                                  print(selectedCurrency);
+                                },
+                              ),
+                            ],
+                          ));
+                    });
+              },
             ),
           ),
           CupertinoListTile(
@@ -118,7 +170,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               balance.reset();
               transactions.reset();
               categories.reset();
-              currency.reset();
+              currencyNotifier.reset();
             },
           ),
         ],

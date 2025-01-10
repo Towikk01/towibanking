@@ -30,7 +30,7 @@ class TabBar extends StatelessWidget {
         switch (index) {
           case 0:
             return CupertinoTabView(
-              builder: (context) => HomeScreen(),
+              builder: (context) => const HomeScreen(),
             );
           case 1:
             return CupertinoTabView(
@@ -38,7 +38,7 @@ class TabBar extends StatelessWidget {
             );
           case 2:
             return CupertinoTabView(
-              builder: (context) =>  SettingsScreen(),
+              builder: (context) => const SettingsScreen(),
             );
           default:
             return CupertinoTabView(

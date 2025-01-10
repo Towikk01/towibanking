@@ -4,6 +4,7 @@ import 'package:towibanking/core/models/transaction.dart';
 
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/riverpod/currency.dart';
 
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
@@ -24,10 +25,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   DateTime customDate = DateTime.now();
 
   @override
+  @override
   Widget build(BuildContext context) {
     final balance = ref.watch(balanceProvider);
     final transactions = ref.watch(transactionProvider);
     final categories = ref.watch(unifiedCategoriesProvider);
+
     final filterForDate = {
       'Все': (List<Transaction> transactions) => transactions,
       'Выбранная дата': (List<Transaction> transactions) => transactions
