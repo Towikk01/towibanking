@@ -24,7 +24,6 @@ class TransactionDialogContentState
     final categories = ref.watch(unifiedCategoriesProvider);
     final currentCategories =
         categories.where((el) => el.type == form.transactionType).toList();
-    // print(categories.where((el) => el.type == 'income').toList());
 
     return Column(
       mainAxisSize: MainAxisSize.min,

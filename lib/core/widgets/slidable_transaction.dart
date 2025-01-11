@@ -19,8 +19,7 @@ class TransactionWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currency = ref.watch(currencyProvider.notifier).selectedCurrency;
-    print(currency);
+    final currency = ref.watch(currencyProvider)['selectedCurrency'];
 
     void removeTransaction() {
       ref.watch(transactionProvider.notifier).removeTransaction(transaction);

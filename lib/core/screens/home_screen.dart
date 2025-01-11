@@ -4,7 +4,6 @@ import 'package:towibanking/core/models/transaction.dart';
 
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
-import 'package:towibanking/core/riverpod/currency.dart';
 
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/theme/app_colors.dart';

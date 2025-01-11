@@ -47,8 +47,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final categories = ref.watch(unifiedCategoriesProvider.notifier);
     final balance = ref.watch(balanceProvider.notifier);
     final transactions = ref.watch(balanceProvider.notifier);
-    var selectedCurrency =
-        ref.watch(currencyProvider.notifier).selectedCurrency;
+    var selectedCurrency = ref.watch(currencyProvider)['selectedCurrency'];
     final currencyNotifier = ref.watch(currencyProvider.notifier);
     var selectedKey = currencies.keys.toList()[0];
 
@@ -120,7 +119,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   });
                                   currencyNotifier.changeCurrency(selectedKey);
                                   Navigator.pop(context);
-                                  print(selectedCurrency);
                                 },
                               ),
                             ],
