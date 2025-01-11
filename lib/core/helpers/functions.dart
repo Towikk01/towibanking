@@ -6,6 +6,65 @@ import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/widgets/add_transaction.dart';
 
+void showCategoriesDialog(
+  BuildContext context,
+  WidgetRef ref,
+  List<Category> categories,
+  String selectedCategory, // Current category
+  void Function(String) onCategorySelected, // Callback to update
+) {
+  showCupertinoDialog(
+    context: context,
+    builder: (BuildContext context) {
+      String localSelectedCategory = selectedCategory;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return CupertinoAlertDialog(
+            title: const Text('Категории'),
+            content: SizedBox(
+              height: 200,
+              child: CupertinoPicker(
+                itemExtent: 50,
+                scrollController: FixedExtentScrollController(
+                  initialItem: categories.indexWhere(
+                    (category) => category.title == localSelectedCategory,
+                  ),
+                ),
+                onSelectedItemChanged: (index) {
+                  setState(() {
+                    localSelectedCategory = categories[index].title;
+                  });
+                },
+                children: categories.map((category) {
+                  return Center(child: Text(category.title));
+                }).toList(),
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('Закрыть'),
+                onPressed: () {
+                  onCategorySelected('Все');
+                  Navigator.of(context).pop();
+                },
+              ),
+              CupertinoDialogAction(
+                child: const Text('Применить'),
+                onPressed: () {
+                  onCategorySelected(
+                      localSelectedCategory); // Update the parent
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
 void showTransactionDialog(
     BuildContext context, WidgetRef ref, List<Category> categories) {
   final currentCategories =
@@ -67,7 +126,7 @@ void showFilterOptions(
       actions: filterActions.entries
           .map((entry) => CupertinoActionSheetAction(
                 onPressed: () {
-                  updateFilter(entry.key); // Update filter outside of setState
+                  updateFilter(entry.key);
                   Navigator.of(context, rootNavigator: true).pop();
                 },
                 child: Text(entry.key),

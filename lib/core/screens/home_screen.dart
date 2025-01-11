@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
 
@@ -22,8 +23,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String currentFilter = 'Все';
   String filterByDate = 'Все';
   DateTime customDate = DateTime.now();
+  String selectedCategory = 'Все';
 
-  @override
   @override
   Widget build(BuildContext context) {
     final balance = ref.watch(balanceProvider);
@@ -71,6 +72,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     var filteredTransactions = filterActions[currentFilter]!(transactions);
     filteredTransactions = filterForDate[filterByDate]!(filteredTransactions);
+
+    if (selectedCategory != 'Все') {
+      filteredTransactions = filteredTransactions
+          .where(
+              (transaction) => transaction.category.title == selectedCategory)
+          .toList();
+    }
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -138,6 +146,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      if (transactions.isNotEmpty)
+                        CupertinoButton(
+                          alignment: Alignment.bottomLeft,
+                          sizeStyle: CupertinoButtonSize.medium,
+                          borderRadius: BorderRadius.zero,
+                          child: const Icon(Icons.category_rounded),
+                          onPressed: () {
+                            showCategoriesDialog(
+                              context,
+                              ref,
+                              categories,
+                              selectedCategory, // Pass the current value
+                              (String newCategory) {
+                                // Callback to handle selection
+                                setState(() {
+                                  selectedCategory =
+                                      newCategory; // Update state here
+                                });
+                              },
+                            );
+                          },
+                        ),
                       const Expanded(
                         child: Text(
                           'Последние транзакции',
@@ -247,10 +277,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: AppColors.lightCream,
               ),
               onPressed: () {
+                print(selectedCategory);
                 showTransactionDialog(context, ref, categories);
               },
             ),
           ),
+          if (currentFilter != 'Все' ||
+              filterByDate != 'Все' ||
+              selectedCategory != 'Все')
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: CupertinoButton.filled(
+                borderRadius: BorderRadius.circular(30),
+                padding: const EdgeInsets.all(16),
+                child: const Icon(
+                  CupertinoIcons.refresh,
+                  color: AppColors.lightCream,
+                ),
+                onPressed: () {
+                  setState(() {
+                    currentFilter = 'Все';
+                    filterByDate = 'Все';
+                    customDate = DateTime.now();
+                    selectedCategory = 'Все';
+                  });
+                },
+              ),
+            ),
         ],
       ),
     );

@@ -33,12 +33,12 @@ class TransactionDialogContentState
           children: {
             'expense': Container(
                 padding: const EdgeInsets.all(10),
-                child: const Text('Расход', style: TextStyle(fontSize: 20))),
+                child: const Text('Расход', style: TextStyle(fontSize: 22))),
             'income': Container(
                 padding: const EdgeInsets.all(10),
                 child: const Text(
                   'Приход',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 22),
                 )),
           },
           onValueChanged: (value) {
@@ -52,7 +52,7 @@ class TransactionDialogContentState
           },
           groupValue: form.transactionType,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 5),
         CupertinoSegmentedControl<String>(
           children: {
             'Наличные': Container(
