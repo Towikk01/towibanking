@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
+import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
@@ -65,24 +66,31 @@ void showCategoriesDialog(
   );
 }
 
-void showTransactionDialog(
-    BuildContext context, WidgetRef ref, List<Category> categories) {
+void showTransactionDialog(BuildContext context, WidgetRef ref,
+    List<Category>? categories, Transaction? transaction) {
   final currentCategories =
-      categories.where((el) => el.type == 'expense').toList();
+      categories!.where((el) => el.type == 'expense').toList();
+  print(transaction.toString());
 
-  final TransactionForm transactionForm = TransactionForm(
-      transactionType: 'expense',
-      paymentMethod: 'Наличные',
-      selectedCategory: currentCategories.first,
-      date: DateTime.now(),
-      amount: 0);
+  final TransactionForm transactionForm = transaction != null
+      ? transaction.toTransactionForm()
+      : TransactionForm(
+          amount: 0,
+          date: DateTime.now(),
+          selectedCategory: currentCategories[0],
+          transactionType: 'expense',
+          paymentMethod: 'Карта',
+        );
 
   showCupertinoDialog(
     context: context,
     builder: (BuildContext context) {
       return CupertinoAlertDialog(
         title: const Text('Добавить транзакцию'),
-        content: TransactionDialogContent(transactionForm: transactionForm),
+        content: TransactionDialogContent(
+          transactionForm: transactionForm,
+          categories: categories,
+        ),
         actions: [
           CupertinoDialogAction(
             child: const Text('Отмена'),
@@ -90,23 +98,28 @@ void showTransactionDialog(
               Navigator.of(context).pop();
             },
           ),
-          CupertinoDialogAction(
-            child: const Text('Добавить'),
-            onPressed: () {
-              if (transactionForm.amount <= 0) return;
-              ref
-                  .watch(transactionProvider.notifier)
-                  .addTransaction(transactionForm.toTransaction());
-              if (transactionForm.transactionType == 'income') {
-                ref.watch(balanceProvider.notifier).addMoney(
-                    transactionForm.amount, transactionForm.paymentMethod);
-              } else if (transactionForm.transactionType == 'expense') {
-                ref.watch(balanceProvider.notifier).removeMoney(
-                    transactionForm.amount, transactionForm.paymentMethod);
-              }
-              Navigator.of(context).pop();
-            },
-          )
+          if (transaction == null)
+            CupertinoDialogAction(
+              child: const Text('Добавить'),
+              onPressed: () {
+                if (transactionForm.amount <= 0) return;
+                ref
+                    .watch(transactionProvider.notifier)
+                    .addTransaction(transactionForm.toTransaction(), ref);
+
+                Navigator.of(context).pop();
+              },
+            ),
+          if (transaction != null)
+            CupertinoDialogAction(
+              child: const Text('Изменить'),
+              onPressed: () {
+                if (transactionForm.amount <= 0) return;
+                ref.watch(transactionProvider.notifier).changeTransaction(
+                    transaction, transactionForm.toTransaction(), ref);
+                Navigator.of(context).pop();
+              },
+            )
         ],
       );
     },

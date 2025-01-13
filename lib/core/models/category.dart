@@ -1,22 +1,21 @@
-import 'package:flutter/cupertino.dart';
+
+import 'package:flutter/material.dart';
 
 class Category {
   String title;
-  IconData? icon;
+  IconData icon;
   String? id;
   String? type;
 
-  Category({required this.title, this.icon, this.id, this.type});
+  Category({required this.title,  this.icon = Icons.add, this.id, this.type});
 
   Map<String, dynamic> toJson() =>
-      {'title': title, 'icon': icon?.codePoint, 'id': id, "type": type};
+      {'title': title, 'icon': icon.codePoint, 'id': id, "type": type};
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
         title: json['title'],
-        icon: json['icon'] != null
-            ? IconData(json['icon'], fontFamily: 'MaterialIcons')
-            : null,
+        icon: IconData(json['icon'], fontFamily: 'MaterialIcons'),
         id: json['id'],
         type: json['type']);
   }

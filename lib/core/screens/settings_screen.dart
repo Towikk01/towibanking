@@ -5,6 +5,7 @@ import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
 import 'package:towibanking/core/riverpod/currency.dart';
+import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/widgets/add_category.dart';
 import 'package:towibanking/core/widgets/remove_category.dart';
 
@@ -50,6 +51,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     var selectedCurrency = ref.watch(currencyProvider)['selectedCurrency'];
     final currencyNotifier = ref.watch(currencyProvider.notifier);
     var selectedKey = currencies.keys.toList()[0];
+    final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
 
     void addCategory() {
       final newCategory = Category(
@@ -69,8 +71,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           CupertinoListTile(
             title: const Text("Темная тема"),
             trailing: CupertinoSwitch(
-              value: false,
-              onChanged: (value) {},
+              value: isDarkTheme,
+              onChanged: (value) {
+                ref.read(themeProvider.notifier).toggleTheme();
+              },
             ),
           ),
           CupertinoListTile(
@@ -94,6 +98,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 height: 50,
                                 child: CupertinoPicker(
                                   itemExtent: 50,
+                                  scrollController: FixedExtentScrollController(
+                                      initialItem: currencies.values
+                                          .toList()
+                                          .indexWhere(
+                                            (val) => val == selectedCurrency,
+                                          )),
                                   onSelectedItemChanged: (int index) {
                                     selectedKey =
                                         currencies.keys.toList()[index];
@@ -165,10 +175,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               style: TextStyle(color: CupertinoColors.destructiveRed),
             ),
             onTap: () {
-              balance.reset();
-              transactions.reset();
-              categories.reset();
-              currencyNotifier.reset();
+              showCupertinoDialog(
+                context: context,
+                builder: (_) {
+                  return CupertinoAlertDialog(
+                    title: const Text("Вы уверены?"),
+                    content: const Text(
+                        "Все данные будут удалены, включая баланс и транзакции"),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: const Text("Отмена"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      CupertinoDialogAction(
+                        child: const Text("Удалить"),
+                        isDestructiveAction: true,
+                        onPressed: () {
+                          balance.reset();
+                          transactions.reset();
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ],

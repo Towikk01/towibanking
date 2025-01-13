@@ -8,6 +8,7 @@ class TransactionForm {
   double amount;
   String comment;
   DateTime? date;
+  String? id;
 
   TransactionForm({
     required this.transactionType,
@@ -15,6 +16,7 @@ class TransactionForm {
     required this.selectedCategory,
     required this.amount,
     this.date,
+    this.id,
     this.comment = '',
   });
 
@@ -26,6 +28,7 @@ class TransactionForm {
       category: selectedCategory,
       date: date ?? DateTime.now(),
       comment: comment.isEmpty ? null : comment,
+      id: DateTime.now().toString(),
     );
   }
 

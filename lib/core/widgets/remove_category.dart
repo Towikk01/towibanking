@@ -14,7 +14,7 @@ class RemoveCategory extends ConsumerStatefulWidget {
 }
 
 class _RemoveCategoryState extends ConsumerState<RemoveCategory> {
-  final Category category = Category(title: '', type: 'expense');
+  final Category category = Category(title: '', type: 'expense',);
   final TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {

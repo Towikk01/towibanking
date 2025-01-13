@@ -1,13 +1,16 @@
 // transaction_dialog.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/category.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
 
 class TransactionDialogContent extends ConsumerStatefulWidget {
   final TransactionForm transactionForm;
-  const TransactionDialogContent({super.key, required this.transactionForm});
+  final List<Category> categories;
+  const TransactionDialogContent(
+      {super.key, required this.transactionForm, required this.categories});
 
   @override
   TransactionDialogContentState createState() =>
@@ -29,29 +32,28 @@ class TransactionDialogContentState
       mainAxisSize: MainAxisSize.min,
       children: [
         CupertinoSegmentedControl<String>(
-          padding: const EdgeInsets.all(10),
-          children: {
-            'expense': Container(
-                padding: const EdgeInsets.all(10),
-                child: const Text('Расход', style: TextStyle(fontSize: 22))),
-            'income': Container(
-                padding: const EdgeInsets.all(10),
-                child: const Text(
-                  'Приход',
-                  style: TextStyle(fontSize: 22),
-                )),
-          },
-          onValueChanged: (value) {
-            setState(() {
-              form.transactionType = value;
-              form.selectedCategory = categories
-                  .where(
-                      (el) => el.type == widget.transactionForm.transactionType)
-                  .first;
-            });
-          },
-          groupValue: form.transactionType,
-        ),
+            padding: const EdgeInsets.all(10),
+            children: {
+              'expense': Container(
+                  padding: const EdgeInsets.all(10),
+                  child: const Text('Расход', style: TextStyle(fontSize: 22))),
+              'income': Container(
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Приход',
+                    style: TextStyle(fontSize: 22),
+                  )),
+            },
+            onValueChanged: (value) {
+              setState(() {
+                form.transactionType = value;
+                form.selectedCategory = categories
+                    .where((el) =>
+                        el.type == widget.transactionForm.transactionType)
+                    .first;
+              });
+            },
+            groupValue: form.transactionType),
         const SizedBox(height: 5),
         CupertinoSegmentedControl<String>(
           children: {
@@ -132,7 +134,8 @@ class TransactionDialogContentState
         CupertinoTextField(
           padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.number,
-          placeholder: 'Введите сумму',
+          placeholder:
+              form.amount == 0.0 ? 'Введите сумму' : form.amount.toString(),
           onChanged: (value) {
             form.amount = double.tryParse(value) ?? 0;
           },

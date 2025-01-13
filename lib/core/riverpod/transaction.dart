@@ -31,16 +31,67 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     prefs.setString('transactions', json.encode(transactionsJson));
   }
 
-  void addTransaction(Transaction transaction) {
+  void addTransaction(Transaction transaction, WidgetRef ref) {
     state = [
       transaction,
       ...state,
     ];
+    if (transaction.type == 'income') {
+      ref
+          .watch(balanceProvider.notifier)
+          .addMoney(transaction.amount, transaction.paymentMethod);
+    } else {
+      ref
+          .watch(balanceProvider.notifier)
+          .removeMoney(transaction.amount, transaction.paymentMethod);
+    }
+    ref.watch(balanceProvider.notifier).saveBalance();
     saveTransactions();
   }
 
-  void removeTransaction(Transaction transaction) {
+  void removeTransaction(Transaction transaction, WidgetRef ref) {
     state = state.where((trans) => trans.date != transaction.date).toList();
+    if (transaction.type == 'income') {
+      ref
+          .watch(balanceProvider.notifier)
+          .removeMoney(transaction.amount, transaction.paymentMethod);
+    } else {
+      ref
+          .watch(balanceProvider.notifier)
+          .addMoney(transaction.amount, transaction.paymentMethod);
+    }
+    ref.watch(balanceProvider.notifier).saveBalance();
+    saveTransactions();
+  }
+
+  void changeTransaction(
+      Transaction oldTransaction, Transaction newTransaction, WidgetRef ref) {
+    // Revert the old transaction
+    if (oldTransaction.type == 'income') {
+      ref
+          .watch(balanceProvider.notifier)
+          .removeMoney(oldTransaction.amount, oldTransaction.paymentMethod);
+    } else if (oldTransaction.type == 'expense') {
+      ref
+          .watch(balanceProvider.notifier)
+          .addMoney(oldTransaction.amount, oldTransaction.paymentMethod);
+    }
+
+    // Apply the new transaction
+    if (newTransaction.type == 'income') {
+      ref
+          .watch(balanceProvider.notifier)
+          .addMoney(newTransaction.amount, newTransaction.paymentMethod);
+    } else if (newTransaction.type == 'expense') {
+      ref
+          .watch(balanceProvider.notifier)
+          .removeMoney(newTransaction.amount, newTransaction.paymentMethod);
+    }
+    ref.watch(balanceProvider.notifier).saveBalance();
+
+    // Update the transaction in the state
+    state =
+        state.map((el) => el == oldTransaction ? newTransaction : el).toList();
     saveTransactions();
   }
 
@@ -57,7 +108,7 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
       comment: comment.isEmpty ? null : comment,
     );
 
-    addTransaction(transaction);
+    addTransaction(transaction, ref);
 
     if (transactionType == 'income') {
       ref.watch(balanceProvider.notifier).addMoney(amount, paymentMethod);

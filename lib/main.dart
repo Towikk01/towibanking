@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
 import 'package:towibanking/core/widgets/tab_bar.dart';
 
@@ -10,29 +11,22 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const CupertinoApp(
-      locale: Locale('ru'),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeProvider);
+    return CupertinoApp(
+      locale: const Locale('ru'),
       title: 'Towibanking',
-      localizationsDelegates: [
+      localizationsDelegates: const [
         DefaultCupertinoLocalizations.delegate,
         DefaultWidgetsLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
-      theme: CupertinoThemeData(
-          brightness: Brightness.dark,
-          primaryColor: AppColors.orange,
-          barBackgroundColor: AppColors.black,
-          scaffoldBackgroundColor: AppColors.black,
-          textTheme: CupertinoTextThemeData(
-            textStyle: TextStyle(color: AppColors.orange, fontSize: 18),
-            primaryColor: CupertinoColors.black,
-          )),
-      home: TabBar(),
+      theme: theme,
+      home: const TabBar(),
     );
   }
 }
