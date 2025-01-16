@@ -18,14 +18,17 @@ class TransactionDialogContent extends ConsumerStatefulWidget {
 
 class TransactionDialogContentState
     extends ConsumerState<TransactionDialogContent> {
-  final TextEditingController _transactionComment = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     final form = widget.transactionForm;
     final categories = ref.watch(unifiedCategoriesProvider);
     final currentCategories =
         categories.where((el) => el.type == form.transactionType).toList();
+    final TextEditingController transactionComment =
+        TextEditingController(text: form.comment);
+    final TextEditingController transactionAmount = TextEditingController(
+        text: form.amount
+            .toStringAsFixed(form.amount.toInt() == form.amount ? 0 : 2));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -138,8 +141,8 @@ class TransactionDialogContentState
         CupertinoTextField(
           padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.number,
-          placeholder:
-              form.amount == 0.0 ? 'Введите сумму' : form.amount.toString(),
+          placeholder: 'Введите сумму',
+          controller: transactionAmount,
           onChanged: (value) {
             form.amount = double.tryParse(value) ?? 0;
           },
@@ -149,7 +152,7 @@ class TransactionDialogContentState
           padding: const EdgeInsets.all(20),
           keyboardType: TextInputType.text,
           placeholder: 'Можно комментик',
-          controller: _transactionComment,
+          controller: transactionComment,
           onChanged: (value) {
             form.comment = value;
           },

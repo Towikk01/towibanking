@@ -1,0 +1,51 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:towibanking/core/models/balance.dart';
+
+class BalanceModal extends ConsumerWidget {
+  final Balance balance;
+  const BalanceModal({super.key, required this.balance});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController cashController = TextEditingController(
+        text: balance.cash
+            .toStringAsFixed(balance.cash.toInt() == balance.cash ? 0 : 2));
+    final TextEditingController cardController = TextEditingController(
+        text: balance.card
+            .toStringAsFixed(balance.card.toInt() == balance.cash ? 0 : 2));
+
+    return Column(
+      children: [
+        Column(
+          spacing: 10,
+          children: [
+            const SizedBox(
+              height: 5,
+            ),
+            CupertinoTextField(
+              controller: cashController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(fontSize: 20),
+              padding: const EdgeInsets.all(14),
+              placeholder: balance.cash.toString(),
+              onChanged: (value) {
+                balance.cash = double.tryParse(value) ?? 0;
+              },
+            ),
+            CupertinoTextField(
+              controller: cardController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(fontSize: 20),
+              padding: const EdgeInsets.all(14),
+              placeholder: balance.card.toString(),
+              onChanged: (value) {
+                balance.card = double.tryParse(value) ?? 0;
+              },
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}

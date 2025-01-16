@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:towibanking/core/models/balance.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
+import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/widgets/add_transaction.dart';
+import 'package:towibanking/core/widgets/balance_modal.dart';
 
 void showCategoriesDialog(
   BuildContext context,
@@ -149,5 +152,33 @@ void showFilterOptions(
         child: const Text('Отмена'),
       ),
     ),
+  );
+}
+
+void showBalanceDialog(BuildContext context, Balance balance, WidgetRef ref) {
+  final balanceNotifier = ref.watch(balanceProvider.notifier);
+  showCupertinoDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return CupertinoAlertDialog(
+        title: const Text('Баланс', style: TextStyle(fontSize: 22)),
+        content: BalanceModal(balance: balance),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Отмена'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          CupertinoDialogAction(
+            child: const Text('Изменить'),
+            onPressed: () {
+              balanceNotifier.updateBalance(balance.cash, balance.card);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
   );
 }

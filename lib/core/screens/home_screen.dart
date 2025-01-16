@@ -90,8 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        border: const Border(
-            bottom: BorderSide(color: CupertinoColors.separator, width: 1)),
+        backgroundColor: isDarkTheme ? AppColors.black : AppColors.lightCream,
         middle: RowBalance(isDarkTheme: isDarkTheme, balance: balance),
       ),
       child: SafeArea(

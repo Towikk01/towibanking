@@ -2,7 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:towibanking/core/models/balance.dart';
 
-
+final isFirstLaunchProvider = FutureProvider.autoDispose<bool>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  return !(prefs.getBool('isInitialBalanceSet') ?? false);
+});
 
 final balanceProvider = StateNotifierProvider<BalanceNotifier, Balance>((ref) {
   return BalanceNotifier()..loadBalance();
@@ -16,6 +19,11 @@ class BalanceNotifier extends StateNotifier<Balance> {
     final cash = prefs.getDouble('cash') ?? 0.0;
     final card = prefs.getDouble('card') ?? 0.0;
     state = Balance(cash: cash, card: card);
+  }
+
+  void updateBalance(double cash, double card) {
+    state = state.copyWith(cash: cash, card: card);
+    saveBalance();
   }
 
   Future<void> saveBalance() async {

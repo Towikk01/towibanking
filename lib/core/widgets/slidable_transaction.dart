@@ -6,6 +6,7 @@ import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/currency.dart';
+import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:intl/intl.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
@@ -23,6 +24,7 @@ class TransactionWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
     final currency = ref.watch(currencyProvider)['selectedCurrency'];
 
     return Slidable(
@@ -31,7 +33,7 @@ class TransactionWidget extends ConsumerWidget {
         children: [
           SlidableAction(
             spacing: 2,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(16),
             onPressed: (context) {
               ref
                   .watch(transactionProvider.notifier)
@@ -46,24 +48,21 @@ class TransactionWidget extends ConsumerWidget {
       ),
       child: GestureDetector(
         onTap: () {
-          print(transaction.toString());
           showTransactionDialog(context, ref, categories, transaction);
         },
         child: Container(
           decoration: BoxDecoration(
               border: Border.all(color: AppColors.secondary, width: 1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(16),
               color: AppColors.black),
           child: CupertinoListTile(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            leading: Container(
-              child: Icon(
-                color: transaction.type == 'income'
-                    ? AppColors.mint
-                    : CupertinoColors.systemRed,
-                transaction.category.icon,
-                size: 34,
-              ),
+            leading: Icon(
+              color: transaction.type == 'income'
+                  ? AppColors.mint
+                  : CupertinoColors.systemRed,
+              transaction.category.icon,
+              size: 34,
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -90,8 +89,11 @@ class TransactionWidget extends ConsumerWidget {
                 Text('${transaction.category.title} - ',
                     style: const TextStyle(
                         fontSize: 18, color: AppColors.lightCream)),
-                Text('${transaction.amount.toStringAsFixed(2)} ${currency}.',
-                    style: const TextStyle(fontSize: 18)),
+                Text('${transaction.amount.toStringAsFixed(2)} $currency.',
+                    style: TextStyle(
+                        fontSize: 18,
+                        color:
+                            isDarkTheme ? AppColors.orange : AppColors.black)),
               ],
             ),
             subtitle: Column(
