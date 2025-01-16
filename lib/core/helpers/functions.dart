@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
-import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/widgets/add_transaction.dart';
 
@@ -36,6 +35,7 @@ void showCategoriesDialog(
                   setState(() {
                     localSelectedCategory = categories[index].title;
                   });
+                  print(localSelectedCategory);
                 },
                 children: categories.map((category) {
                   return Center(child: Text(category.title));
@@ -70,7 +70,6 @@ void showTransactionDialog(BuildContext context, WidgetRef ref,
     List<Category>? categories, Transaction? transaction) {
   final currentCategories =
       categories!.where((el) => el.type == 'expense').toList();
-  print(transaction.toString());
 
   final TransactionForm transactionForm = transaction != null
       ? transaction.toTransactionForm()

@@ -9,8 +9,14 @@ import 'package:towibanking/core/riverpod/theme.dart';
 
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
+import 'package:towibanking/core/widgets/button_add.dart';
+import 'package:towibanking/core/widgets/date_filter_list.dart';
+import 'package:towibanking/core/widgets/date_picker.dart';
+import 'package:towibanking/core/widgets/list_transactions.dart';
+import 'package:towibanking/core/widgets/reset_button.dart';
+import 'package:towibanking/core/widgets/row_balance.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:towibanking/core/widgets/slidable_transaction.dart';
 import 'package:towibanking/core/helpers/functions.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -86,69 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       navigationBar: CupertinoNavigationBar(
         border: const Border(
             bottom: BorderSide(color: CupertinoColors.separator, width: 1)),
-        middle:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Наличные:',
-                style: TextStyle(
-                    fontSize: 16,
-                    color:
-                        isDarkTheme ? AppColors.lightCream : AppColors.black),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                '${balance.cash}',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkTheme ? AppColors.orange : AppColors.mint),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Карта:',
-                style: TextStyle(
-                    fontSize: 16,
-                    color:
-                        isDarkTheme ? AppColors.lightCream : AppColors.black),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                '${balance.card}',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkTheme ? AppColors.orange : AppColors.mint),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Общий:',
-                style: TextStyle(
-                    fontSize: 16,
-                    color:
-                        isDarkTheme ? AppColors.lightCream : AppColors.black),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                '${balance.cash + balance.card}',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkTheme ? AppColors.orange : AppColors.mint),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ]),
+        middle: RowBalance(isDarkTheme: isDarkTheme, balance: balance),
       ),
       child: SafeArea(
         child: Stack(
@@ -156,7 +100,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: transactions.isEmpty
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
@@ -187,13 +133,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               );
                             },
                           ),
-                        const Expanded(
-                          child: Text(
-                            'Последние транзакции',
-                            style: TextStyle(fontSize: 26),
-                            textAlign: TextAlign.center,
+                        if (transactions.isNotEmpty)
+                          Expanded(
+                            child: Text(
+                              'Последние транзакции',
+                              style: TextStyle(
+                                  fontSize: 26,
+                                  color: isDarkTheme
+                                      ? AppColors.orange
+                                      : AppColors.black),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
                         if (transactions.isNotEmpty)
                           CupertinoButton(
                             alignment: Alignment.bottomLeft,
@@ -213,107 +164,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   if (transactions.isNotEmpty)
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        spacing: 0,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: filterForDate.entries.map((entry) {
-                          return CupertinoButton(
-                            sizeStyle: CupertinoButtonSize.medium,
-                            child: Text(entry.key,
-                                style: TextStyle(
-                                    color: filterByDate == entry.key
-                                        ? (isDarkTheme
-                                            ? AppColors.lightCream
-                                            : AppColors.black)
-                                        : AppColors.secondary)),
-                            onPressed: () {
-                              setState(() {
-                                filterByDate = entry.key;
-                              });
-                            },
-                          );
-                        }).toList(),
-                      ),
+                    DateFilterList(
+                      filterByDate: filterByDate,
+                      filterForDate: filterForDate,
+                      isDarkTheme: isDarkTheme,
+                      onPressed: (String newFilter) {
+                        setState(() {
+                          filterByDate = newFilter;
+                        });
+                      },
                     ),
                   const SizedBox(height: 5),
                   if (transactions.isNotEmpty)
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: isDarkTheme
-                              ? AppColors.orange
-                              : AppColors.lightCream),
-                      height: 50,
-                      width: 300,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: CupertinoDatePicker(
-                          itemExtent: 50,
-                          backgroundColor: isDarkTheme
-                              ? AppColors.orange
-                              : AppColors.lightCream,
-                          mode: CupertinoDatePickerMode.date,
-                          initialDateTime: DateTime.now(),
-                          onDateTimeChanged: (DateTime newDate) {
+                    DatePicker(
+                        customDate: customDate,
+                        isDarkTheme: isDarkTheme,
+                        onChanged: (DateTime newDate) {
+                          setState(() {
                             customDate = newDate;
-                          },
-                        ),
-                      ),
-                    ),
+                            filterByDate = 'Выбранная дата';
+                          });
+                        }),
                   const SizedBox(
                     height: 10,
                   ),
                   filteredTransactions.isNotEmpty
-                      ? Container(
-                          height: 500,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ListView.separated(
-                              separatorBuilder: (context, index) => Container(
-                                height: 8,
-                                color: CupertinoColors.transparent,
-                              ),
-                              itemCount: filteredTransactions.length,
-                              itemBuilder: (context, index) {
-                                final transaction = transactions[index];
-                                return TransactionWidget(
-                                    transaction: transaction,
-                                    categories: categories);
-                              },
-                            ),
-                          ),
+                      ? ListTransactions(
+                          filteredTransactions: filteredTransactions,
+                          transactions: transactions,
+                          categories: categories,
                         )
                       : transactions.isNotEmpty
-                          ? Text('Нет транзакций по фильтру...',
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  color: isDarkTheme
-                                      ? AppColors.orange
-                                      : AppColors.black))
-                          : Text('Еще нет транзакций...',
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  color: isDarkTheme
-                                      ? AppColors.orange
-                                      : AppColors.black))
+                          ? Center(
+                              heightFactor: 12,
+                              child: Text('Нет транзакций по фильтру...',
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      color: isDarkTheme
+                                          ? AppColors.orange
+                                          : AppColors.black)),
+                            )
+                          : Column(
+                              mainAxisSize: MainAxisSize.max,
+                              spacing: 10,
+                              children: [
+                                Text('Еще нет транзакций...',
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkTheme
+                                            ? AppColors.orange
+                                            : AppColors.black)),
+                                Text('Можно добавить!',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: isDarkTheme
+                                            ? AppColors.orange
+                                            : AppColors.black,
+                                        fontWeight: FontWeight.w300)),
+                              ],
+                            )
                 ],
               ),
             ),
             Positioned(
               bottom: 20,
               right: 20,
-              child: CupertinoButton.filled(
-                borderRadius: BorderRadius.circular(30),
-                padding: const EdgeInsets.all(16),
-                child: const Icon(
-                  CupertinoIcons.add,
-                  color: AppColors.lightCream,
-                ),
-                onPressed: () {
-                  showTransactionDialog(context, ref, categories, null);
-                },
+              child: Column(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (transactions.isEmpty)
+                    SvgPicture.asset(
+                      alignment: Alignment.topLeft,
+                      'assets/add.svg',
+                      width: 150,
+                      height: 150,
+                    ),
+                  ButtonAdd(categories: categories),
+                ],
               ),
             ),
             if (currentFilter != 'Все' ||
@@ -322,22 +251,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Positioned(
                 bottom: 20,
                 left: 20,
-                child: CupertinoButton.filled(
-                  borderRadius: BorderRadius.circular(30),
-                  padding: const EdgeInsets.all(16),
-                  child: const Icon(
-                    CupertinoIcons.refresh,
-                    color: AppColors.lightCream,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      currentFilter = 'Все';
-                      filterByDate = 'Все';
-                      customDate = DateTime.now();
-                      selectedCategory = 'Все';
-                    });
-                  },
-                ),
+                child: ResetButton(reset: () {
+                  setState(() {
+                    currentFilter = 'Все';
+                    filterByDate = 'Все';
+                    customDate = DateTime.now();
+                    selectedCategory = 'Все';
+                  });
+                }),
               ),
           ],
         ),

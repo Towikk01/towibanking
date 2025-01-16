@@ -32,9 +32,11 @@ class TransactionWidget extends ConsumerWidget {
           SlidableAction(
             spacing: 2,
             borderRadius: BorderRadius.circular(10),
-            onPressed: (context) => ref
-                .watch(transactionProvider.notifier)
-                .removeTransaction(transaction, ref),
+            onPressed: (context) {
+              ref
+                  .watch(transactionProvider.notifier)
+                  .removeTransaction(transaction, ref);
+            },
             backgroundColor: AppColors.secondary,
             foregroundColor: CupertinoColors.white,
             icon: CupertinoIcons.delete,
@@ -44,6 +46,7 @@ class TransactionWidget extends ConsumerWidget {
       ),
       child: GestureDetector(
         onTap: () {
+          print(transaction.toString());
           showTransactionDialog(context, ref, categories, transaction);
         },
         child: Container(

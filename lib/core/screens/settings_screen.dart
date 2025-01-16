@@ -186,7 +186,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       CupertinoDialogAction(
                         child: const Text("Отмена"),
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.of(context, rootNavigator: true)
+                              .pop(context);
                         },
                       ),
                       CupertinoDialogAction(

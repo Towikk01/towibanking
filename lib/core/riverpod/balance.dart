@@ -1,31 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:towibanking/core/models/balance.dart';
 
-class Balance {
-  double cash;
-  double card;
 
-  Balance({this.cash = 0.0, this.card = 0.0});
-
-  Balance copyWith({double? cash, double? card}) {
-    return Balance(
-      cash: cash ?? this.cash,
-      card: card ?? this.card,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'cash': cash,
-        'card': card,
-      };
-
-  factory Balance.fromJson(Map<String, dynamic> json) {
-    return Balance(
-      cash: json['cash'] ?? 0.0,
-      card: json['card'] ?? 0.0,
-    );
-  }
-}
 
 final balanceProvider = StateNotifierProvider<BalanceNotifier, Balance>((ref) {
   return BalanceNotifier()..loadBalance();

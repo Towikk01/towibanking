@@ -50,4 +50,9 @@ class Transaction {
         comment: comment ?? '',
         id: id);
   }
+
+  @override
+  String toString() {
+    return "Transaction: $amount, $type, $paymentMethod, $category, $date, $comment, $id";
+  }
 }

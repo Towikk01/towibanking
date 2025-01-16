@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/category.dart';
-import 'package:towibanking/core/theme/app_colors.dart';
 
 class TransactionDialogContent extends ConsumerStatefulWidget {
   final TransactionForm transactionForm;
@@ -121,6 +120,11 @@ class TransactionDialogContentState
         const SizedBox(height: 10),
         CupertinoPicker(
           itemExtent: 50,
+          scrollController: FixedExtentScrollController(
+            initialItem: currentCategories.indexWhere(
+              (category) => category.title == form.selectedCategory.title,
+            ),
+          ),
           onSelectedItemChanged: (index) {
             setState(() {
               form.selectedCategory = currentCategories[index];

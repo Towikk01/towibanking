@@ -32,6 +32,7 @@ class TransactionForm {
     );
   }
 
+  
   @override
   String toString() {
     return 'TransactionForm{transactionType: $transactionType, paymentMethod: $paymentMethod, selectedCategory: $selectedCategory, amount: $amount, comment: $comment, date: $date}';
