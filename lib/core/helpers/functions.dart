@@ -38,7 +38,6 @@ void showCategoriesDialog(
                   setState(() {
                     localSelectedCategory = categories[index].title;
                   });
-                  print(localSelectedCategory);
                 },
                 children: categories.map((category) {
                   return Center(child: Text(category.title));

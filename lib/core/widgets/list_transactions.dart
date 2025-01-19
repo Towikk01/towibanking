@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
+import 'package:towibanking/core/riverpod/theme.dart';
+import 'package:towibanking/core/theme/app_colors.dart';
 import 'package:towibanking/core/widgets/slidable_transaction.dart';
 import 'package:intl/intl.dart';
 
@@ -27,26 +29,40 @@ class ListTransactions extends ConsumerWidget {
           dateFormat.format(now.subtract(const Duration(days: 1)))) {
         return 'Вчера';
       } else {
-        return DateFormat('MMMM dd, yyyy', 'ru').format(date);
+        return DateFormat('dd MMMM, yyyy', 'ru').format(date);
       }
     }
 
-    // Sort transactions by date in descending order
     transactions.sort((a, b) => b.date.compareTo(a.date));
 
     final groupedTransactions = <Map<String, dynamic>>[];
+    final dailyTotals = <String, Map<String, double>>{};
 
     String? lastDateLabel;
     for (var transaction in transactions) {
       String currentDateLabel = getDateLabel(transaction.date);
 
-      // Add a new header if it's a new group
+      dailyTotals.putIfAbsent(
+          currentDateLabel, () => {'income': 0.0, 'expense': 0.0});
+      if (transaction.type == 'income') {
+        dailyTotals[currentDateLabel]!['income'] =
+            (dailyTotals[currentDateLabel]!['income'] ?? 0.0) +
+                transaction.amount;
+      } else {
+        dailyTotals[currentDateLabel]!['expense'] =
+            (dailyTotals[currentDateLabel]!['expense'] ?? 0.0) +
+                transaction.amount.abs();
+      }
+
       if (currentDateLabel != lastDateLabel) {
-        groupedTransactions.add({'isHeader': true, 'label': currentDateLabel});
+        groupedTransactions.add({
+          'isHeader': true,
+          'label': currentDateLabel,
+          'totals': dailyTotals[currentDateLabel]
+        });
         lastDateLabel = currentDateLabel;
       }
 
-      // Add the transaction under the current group
       groupedTransactions.add({'isHeader': false, 'transaction': transaction});
     }
 
@@ -56,6 +72,7 @@ class ListTransactions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupedTransactions = groupTransactionsByDay(filteredTransactions);
+    final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
 
     return SizedBox(
       height: 500,
@@ -66,14 +83,37 @@ class ListTransactions extends ConsumerWidget {
           itemBuilder: (context, index) {
             final item = groupedTransactions[index];
 
-            // Render headers or transactions
             if (item['isHeader']) {
+              final totals = item['totals'] as Map<String, double>;
+              final income = totals['income'] ?? 0.0;
+              final expense = totals['expense'] ?? 0.0;
+
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  item['label'] as String,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      item['label'] as String,
+                      style: TextStyle(
+                        color: isDarkTheme
+                            ? AppColors.lightCream
+                            : AppColors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '+${income.toStringAsFixed(income.toInt() == income ? 0 : 2)} / -${expense.toStringAsFixed(expense.toInt() == expense ? 0 : 2)}',
+                      style: TextStyle(
+                        color: isDarkTheme
+                            ? AppColors.lightCream
+                            : AppColors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
                 ),
               );
             } else {

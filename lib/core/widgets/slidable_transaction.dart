@@ -98,12 +98,17 @@ class TransactionWidget extends ConsumerWidget {
                           color: isDarkTheme
                               ? AppColors.lightCream
                               : AppColors.black)),
-                  Text('${transaction.amount.toStringAsFixed(2)} $currency.',
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: isDarkTheme
-                              ? AppColors.orange
-                              : CupertinoColors.activeGreen)),
+                  SizedBox(
+                    width: 110,
+                    child: Text(
+                        '${transaction.amount.toStringAsFixed(transaction.amount == transaction.amount.toInt() ? 0 : 2)} $currency.',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: isDarkTheme
+                                ? AppColors.orange
+                                : CupertinoColors.activeGreen)),
+                  ),
                 ],
               ),
               subtitle: Column(

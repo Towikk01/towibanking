@@ -9,13 +9,15 @@ class BalanceModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final TextEditingController cashController = TextEditingController(
-        text: balance.card == 0
+        text: balance.cash == 0
             ? null
             : balance.cash
                 .toStringAsFixed(balance.cash.toInt() == balance.cash ? 0 : 2));
     final TextEditingController cardController = TextEditingController(
-        text: balance.card
-            .toStringAsFixed(balance.card.toInt() == balance.cash ? 0 : 2));
+        text: balance.card == 0
+            ? null
+            : balance.card
+                .toStringAsFixed(balance.card.toInt() == balance.cash ? 0 : 2));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,7 +32,7 @@ class BalanceModal extends ConsumerWidget {
           keyboardType: TextInputType.number,
           style: const TextStyle(fontSize: 20),
           padding: const EdgeInsets.all(14),
-          placeholder: balance.cash.toString(),
+          placeholder: balance.cash.toStringAsFixed(0),
           onChanged: (value) {
             balance.cash = double.tryParse(value) ?? 0;
           },
@@ -41,7 +43,7 @@ class BalanceModal extends ConsumerWidget {
           keyboardType: TextInputType.number,
           style: const TextStyle(fontSize: 20),
           padding: const EdgeInsets.all(14),
-          placeholder: balance.card.toString(),
+          placeholder: balance.card.toStringAsFixed(0),
           onChanged: (value) {
             balance.card = double.tryParse(value) ?? 0;
           },
