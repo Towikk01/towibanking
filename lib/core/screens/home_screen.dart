@@ -184,13 +184,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             filterByDate = 'Выбранная дата';
                           });
                         }),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   filteredTransactions.isNotEmpty
                       ? ListTransactions(
                           filteredTransactions: filteredTransactions,
-                          transactions: transactions,
+                          // transactions: transactions,
                           categories: categories,
                         )
                       : transactions.isNotEmpty
@@ -245,8 +242,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             if (currentFilter != 'Все' ||
-                filterByDate != 'Все' ||
-                selectedCategory != 'Все')
+                selectedCategory != 'Все' ||
+                (filterByDate == 'Выбранная дата' &&
+                    (customDate.day != DateTime.now().day ||
+                        customDate.month != DateTime.now().month ||
+                        customDate.year != DateTime.now().year)))
               Positioned(
                 bottom: 20,
                 left: 20,

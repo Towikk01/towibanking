@@ -28,7 +28,7 @@ class RowBalance extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             Text(
-              '${balance.cash}',
+              '${balance.cash.toInt() == balance.cash ? balance.cash.toInt() : balance.cash.toStringAsFixed(2)}',
               style: TextStyle(
                   fontSize: 16,
                   color: isDarkTheme ? AppColors.orange : AppColors.mint),
@@ -47,7 +47,7 @@ class RowBalance extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             Text(
-              '${balance.card}',
+              '${balance.card.toInt() == balance.card ? balance.card.toInt() : balance.card.toStringAsFixed(2)}',
               style: TextStyle(
                   fontSize: 16,
                   color: isDarkTheme ? AppColors.orange : AppColors.mint),
@@ -66,7 +66,7 @@ class RowBalance extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             Text(
-              '${balance.cash + balance.card}',
+              '${(balance.cash + balance.card) == (balance.cash + balance.card).toInt() ? (balance.cash + balance.card).toInt() : (balance.cash + balance.card).toStringAsFixed(2)}',
               style: TextStyle(
                   fontSize: 16,
                   color: isDarkTheme ? AppColors.orange : AppColors.mint),

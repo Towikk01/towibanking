@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/riverpod/theme.dart';
+import 'package:towibanking/core/theme/app_colors.dart';
 
 class TransactionDialogContent extends ConsumerStatefulWidget {
   final TransactionForm transactionForm;
@@ -20,6 +22,8 @@ class TransactionDialogContentState
     extends ConsumerState<TransactionDialogContent> {
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
+
     final form = widget.transactionForm;
     final categories = ref.watch(unifiedCategoriesProvider);
     final currentCategories =
@@ -27,8 +31,10 @@ class TransactionDialogContentState
     final TextEditingController transactionComment =
         TextEditingController(text: form.comment);
     final TextEditingController transactionAmount = TextEditingController(
-        text: form.amount
-            .toStringAsFixed(form.amount.toInt() == form.amount ? 0 : 2));
+        text: form.amount == 0
+            ? null
+            : form.amount
+                .toStringAsFixed(form.amount.toInt() == form.amount ? 0 : 2));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -89,7 +95,9 @@ class TransactionDialogContentState
                 DateTime tempPickedDate = form.date!;
                 return Container(
                   height: 250,
-                  color: CupertinoColors.black,
+                  color: isDarkTheme
+                      ? CupertinoColors.black
+                      : AppColors.lightCream,
                   child: Column(
                     children: [
                       SizedBox(

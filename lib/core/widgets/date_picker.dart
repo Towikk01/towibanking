@@ -18,15 +18,14 @@ class DatePicker extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: isDarkTheme ? AppColors.orange : AppColors.lightCream),
+          color: CupertinoColors.transparent),
       height: 50,
       width: 300,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: CupertinoDatePicker(
           itemExtent: 50,
-          backgroundColor:
-              isDarkTheme ? AppColors.orange : AppColors.lightCream,
+          backgroundColor: CupertinoColors.transparent,
           mode: CupertinoDatePickerMode.date,
           initialDateTime: DateTime.now(),
           onDateTimeChanged: (DateTime newDate) {

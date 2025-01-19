@@ -16,7 +16,10 @@ class ProfileScreen extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage(''), // или NetworkImage
+              backgroundImage: NetworkImage(
+                'https://avatar.iran.liara.run/public',
+                scale: 1,
+              ), // или NetworkImage
             ),
             const SizedBox(height: 20),
             const Text(
