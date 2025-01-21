@@ -5,6 +5,7 @@ import 'package:towibanking/core/models/transaction.dart';
 
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/riverpod/language.dart';
 import 'package:towibanking/core/riverpod/theme.dart';
 
 import 'package:towibanking/core/riverpod/transaction.dart';
@@ -16,6 +17,7 @@ import 'package:towibanking/core/widgets/list_transactions.dart';
 import 'package:towibanking/core/widgets/reset_button.dart';
 import 'package:towibanking/core/widgets/row_balance.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:towibanking/core/helpers/functions.dart';
 
@@ -27,61 +29,78 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String currentFilter = 'Все';
-  String filterByDate = 'Все';
+  String currentFilter = '';
+  String filterByDate = '';
   DateTime customDate = DateTime.now();
-  String selectedCategory = 'Все';
+  String selectedCategory = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    currentFilter = AppLocalizations.of(context)!.all;
+    filterByDate = AppLocalizations.of(context)!.all;
+    selectedCategory = AppLocalizations.of(context)!.all;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final language = ref.watch(languageNotifierProvider);
     final balance = ref.watch(balanceProvider);
     final transactions = ref.watch(transactionProvider);
     final categories = ref.watch(unifiedCategoriesProvider);
     final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
 
     final filterForDate = {
-      'Все': (List<Transaction> transactions) => transactions,
-      'Выбранная дата': (List<Transaction> transactions) => transactions
-          .where((el) =>
-              el.date.day == customDate.day &&
-              el.date.month == customDate.month &&
-              el.date.year == customDate.year)
-          .toList(),
-      'Сегодня': (List<Transaction> transactions) => transactions
-          .where((el) =>
-              el.date.day == DateTime.now().day &&
-              el.date.month == DateTime.now().month &&
-              el.date.year == DateTime.now().year)
-          .toList(),
-      'Последние 7 дней': (List<Transaction> transactions) => transactions
-          .where((el) =>
-              el.date.isAfter(DateTime.now().subtract(const Duration(days: 7))))
-          .toList(),
-      'Последний месяц': (List<Transaction> transactions) => transactions
-          .where((el) => el.date
-              .isAfter(DateTime.now().subtract(const Duration(days: 30))))
-          .toList(),
-      'Последние полгода': (List<Transaction> transactions) => transactions
-          .where((el) => el.date
-              .isAfter(DateTime.now().subtract(const Duration(days: 180))))
-          .toList(),
-      'Последний год': (List<Transaction> transactions) => transactions
-          .where((el) => el.date
-              .isAfter(DateTime.now().subtract(const Duration(days: 365))))
-          .toList(),
+      AppLocalizations.of(context)!.all: (List<Transaction> transactions) =>
+          transactions,
+      AppLocalizations.of(context)!.curDate: (List<Transaction> transactions) =>
+          transactions
+              .where((el) =>
+                  el.date.day == customDate.day &&
+                  el.date.month == customDate.month &&
+                  el.date.year == customDate.year)
+              .toList(),
+      AppLocalizations.of(context)!.today: (List<Transaction> transactions) =>
+          transactions
+              .where((el) =>
+                  el.date.day == DateTime.now().day &&
+                  el.date.month == DateTime.now().month &&
+                  el.date.year == DateTime.now().year)
+              .toList(),
+      AppLocalizations.of(context)!.lastWeek:
+          (List<Transaction> transactions) => transactions
+              .where((el) => el.date
+                  .isAfter(DateTime.now().subtract(const Duration(days: 7))))
+              .toList(),
+      AppLocalizations.of(context)!.lastMonth:
+          (List<Transaction> transactions) => transactions
+              .where((el) => el.date
+                  .isAfter(DateTime.now().subtract(const Duration(days: 30))))
+              .toList(),
+      AppLocalizations.of(context)!.lastSixMonth:
+          (List<Transaction> transactions) => transactions
+              .where((el) => el.date
+                  .isAfter(DateTime.now().subtract(const Duration(days: 180))))
+              .toList(),
+      AppLocalizations.of(context)!.lastYear:
+          (List<Transaction> transactions) => transactions
+              .where((el) => el.date
+                  .isAfter(DateTime.now().subtract(const Duration(days: 365))))
+              .toList(),
     };
     final filterActions = {
-      'Только доходы': (List<Transaction> transactions) =>
+      AppLocalizations.of(context)!.onlyInc: (List<Transaction> transactions) =>
           transactions.where((el) => el.type == 'income').toList(),
-      'Только расходы': (List<Transaction> transactions) =>
+      AppLocalizations.of(context)!.onlyExp: (List<Transaction> transactions) =>
           transactions.where((el) => el.type == 'expense').toList(),
-      'Все': (List<Transaction> transactions) => transactions,
+      AppLocalizations.of(context)!.all: (List<Transaction> transactions) =>
+          transactions,
     };
 
     var filteredTransactions = filterActions[currentFilter]!(transactions);
     filteredTransactions = filterForDate[filterByDate]!(filteredTransactions);
 
-    if (selectedCategory != 'Все') {
+    if (selectedCategory != AppLocalizations.of(context)!.all) {
       filteredTransactions = filteredTransactions
           .where(
               (transaction) => transaction.category.title == selectedCategory)
@@ -135,7 +154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         if (transactions.isNotEmpty)
                           Expanded(
                             child: Text(
-                              'Последние транзакции',
+                              AppLocalizations.of(context)!.lastTransactions,
                               style: TextStyle(
                                   fontSize: 26,
                                   color: isDarkTheme
@@ -170,6 +189,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onPressed: (String newFilter) {
                         setState(() {
                           filterByDate = newFilter;
+                          print(filterByDate);
                         });
                       },
                     ),
@@ -181,7 +201,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         onChanged: (DateTime newDate) {
                           setState(() {
                             customDate = newDate;
-                            filterByDate = 'Выбранная дата';
+                            filterByDate =
+                                AppLocalizations.of(context)!.curDate;
                           });
                         }),
                   filteredTransactions.isNotEmpty
@@ -192,8 +213,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         )
                       : transactions.isNotEmpty
                           ? Center(
-                              heightFactor: 12,
-                              child: Text('Нет транзакций по фильтру...',
+                              heightFactor: language == 'uk' ? 6 : 12,
+                              child: Text(
+                                  AppLocalizations.of(context)!
+                                      .noFilterTransactions,
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 24,
                                       color: isDarkTheme
@@ -204,14 +228,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               mainAxisSize: MainAxisSize.max,
                               spacing: 10,
                               children: [
-                                Text('Еще нет транзакций...',
+                                Text(
+                                    AppLocalizations.of(context)!
+                                        .noTransactions,
                                     style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
                                         color: isDarkTheme
                                             ? AppColors.orange
                                             : AppColors.black)),
-                                Text('Можно добавить!',
+                                Text(AppLocalizations.of(context)!.canAdd,
                                     style: TextStyle(
                                         fontSize: 18,
                                         color: isDarkTheme
@@ -241,9 +267,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-            if (currentFilter != 'Все' ||
-                selectedCategory != 'Все' ||
-                (filterByDate == 'Выбранная дата' &&
+            if (currentFilter != AppLocalizations.of(context)!.all ||
+                selectedCategory != AppLocalizations.of(context)!.all ||
+                (filterByDate == AppLocalizations.of(context)!.curDate &&
                     (customDate.day != DateTime.now().day ||
                         customDate.month != DateTime.now().month ||
                         customDate.year != DateTime.now().year)))
@@ -252,10 +278,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 left: 20,
                 child: ResetButton(reset: () {
                   setState(() {
-                    currentFilter = 'Все';
-                    filterByDate = 'Все';
+                    currentFilter = AppLocalizations.of(context)!.all;
+                    filterByDate = AppLocalizations.of(context)!.all;
                     customDate = DateTime.now();
-                    selectedCategory = 'Все';
+                    selectedCategory = AppLocalizations.of(context)!.all;
                   });
                 }),
               ),

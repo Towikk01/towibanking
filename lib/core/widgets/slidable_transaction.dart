@@ -5,10 +5,13 @@ import 'package:towibanking/core/helpers/functions.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/currency.dart';
+import 'package:towibanking/core/riverpod/language.dart';
 import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:intl/intl.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TransactionWidget extends ConsumerWidget {
   final Transaction transaction;
@@ -17,14 +20,15 @@ class TransactionWidget extends ConsumerWidget {
   const TransactionWidget(
       {super.key, required this.transaction, required this.categories});
 
-  String formattedDate(DateTime date) {
-    return DateFormat('d MMM yyyy', 'ru').format(date);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
     final currency = ref.watch(currencyProvider)['selectedCurrency'];
+    final language = ref.watch(languageNotifierProvider);
+
+    String formattedDate(DateTime date) {
+      return DateFormat('d MMM yyyy', language).format(date);
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -38,12 +42,12 @@ class TransactionWidget extends ConsumerWidget {
               onPressed: (context) {
                 ref
                     .watch(transactionProvider.notifier)
-                    .removeTransaction(transaction, ref);
+                    .removeTransaction(transaction, ref, context);
               },
               backgroundColor: AppColors.secondary,
               foregroundColor: CupertinoColors.white,
               icon: CupertinoIcons.delete,
-              label: 'Удалить',
+              label: AppLocalizations.of(context)!.remove,
             ),
           ],
         ),
@@ -101,7 +105,7 @@ class TransactionWidget extends ConsumerWidget {
                   SizedBox(
                     width: 110,
                     child: Text(
-                        '${transaction.amount.toStringAsFixed(transaction.amount == transaction.amount.toInt() ? 0 : 2)} $currency.',
+                        '${transaction.amount.toStringAsFixed(transaction.amount == transaction.amount.toInt() ? 0 : 2)} $currency',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontSize: 18,
@@ -115,7 +119,7 @@ class TransactionWidget extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                      '${transaction.type == 'income' ? 'Приход' : 'Расход'} - ${transaction.paymentMethod}',
+                      '${transaction.type == 'income' ? AppLocalizations.of(context)!.income : AppLocalizations.of(context)!.expense} - ${transaction.paymentMethod == 'cash' ? AppLocalizations.of(context)!.cash : AppLocalizations.of(context)!.card}',
                       style: TextStyle(
                           fontSize: 16,
                           color: isDarkTheme

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/helpers/functions.dart';
 import 'package:towibanking/core/models/balance.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RowBalance extends ConsumerWidget {
   final bool isDarkTheme;
@@ -21,7 +22,7 @@ class RowBalance extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Наличные:',
+              '${AppLocalizations.of(context)!.cash}:',
               style: TextStyle(
                   fontSize: 16,
                   color: isDarkTheme ? AppColors.lightCream : AppColors.black),
@@ -40,7 +41,7 @@ class RowBalance extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Карта:',
+              '${AppLocalizations.of(context)!.card}:',
               style: TextStyle(
                   fontSize: 16,
                   color: isDarkTheme ? AppColors.lightCream : AppColors.black),
@@ -59,7 +60,7 @@ class RowBalance extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Общий:',
+              '${AppLocalizations.of(context)!.total}:',
               style: TextStyle(
                   fontSize: 16,
                   color: isDarkTheme ? AppColors.lightCream : AppColors.black),

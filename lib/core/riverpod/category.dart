@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:towibanking/core/models/category.dart';
 
+
 final defaultCategories = [
   Category(title: 'Питание', icon: Icons.fastfood, id: 'food', type: 'expense'),
   Category(title: 'Дом', icon: Icons.home, id: 'home', type: 'expense'),

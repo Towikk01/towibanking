@@ -8,6 +8,7 @@ import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/transaction.dart';
 import 'package:towibanking/core/widgets/add_transaction.dart';
 import 'package:towibanking/core/widgets/balance_modal.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void showCategoriesDialog(
   BuildContext context,
@@ -20,11 +21,10 @@ void showCategoriesDialog(
     context: context,
     builder: (BuildContext context) {
       String localSelectedCategory = selectedCategory;
-
       return StatefulBuilder(
         builder: (context, setState) {
           return CupertinoAlertDialog(
-            title: const Text('Категории'),
+            title: Text(AppLocalizations.of(context)!.categories),
             content: SizedBox(
               height: 200,
               child: CupertinoPicker(
@@ -46,14 +46,14 @@ void showCategoriesDialog(
             ),
             actions: [
               CupertinoDialogAction(
-                child: const Text('Закрыть'),
+                child: Text(AppLocalizations.of(context)!.cancel),
                 onPressed: () {
-                  onCategorySelected('Все');
+                  onCategorySelected(AppLocalizations.of(context)!.all);
                   Navigator.of(context).pop();
                 },
               ),
               CupertinoDialogAction(
-                child: const Text('Применить'),
+                child: Text(AppLocalizations.of(context)!.change),
                 onPressed: () {
                   onCategorySelected(
                       localSelectedCategory); // Update the parent
@@ -80,44 +80,43 @@ void showTransactionDialog(BuildContext context, WidgetRef ref,
           date: DateTime.now(),
           selectedCategory: currentCategories[0],
           transactionType: 'expense',
-          paymentMethod: 'Карта',
+          paymentMethod: 'cash',
         );
 
   showCupertinoDialog(
     context: context,
     builder: (BuildContext context) {
       return CupertinoAlertDialog(
-        title: const Text('Добавить транзакцию'),
+        title: Text(AppLocalizations.of(context)!.addTransaction),
         content: TransactionDialogContent(
           transactionForm: transactionForm,
           categories: categories,
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Отмена'),
+            child: Text(AppLocalizations.of(context)!.cancel),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           if (transaction == null)
             CupertinoDialogAction(
-              child: const Text('Добавить'),
+              child: Text(AppLocalizations.of(context)!.add),
               onPressed: () {
                 if (transactionForm.amount <= 0) return;
-                ref
-                    .watch(transactionProvider.notifier)
-                    .addTransaction(transactionForm.toTransaction(), ref);
+                ref.watch(transactionProvider.notifier).addTransaction(
+                    transactionForm.toTransaction(), ref, context);
 
                 Navigator.of(context).pop();
               },
             ),
           if (transaction != null)
             CupertinoDialogAction(
-              child: const Text('Изменить'),
+              child: Text(AppLocalizations.of(context)!.change),
               onPressed: () {
                 if (transactionForm.amount <= 0) return;
                 ref.watch(transactionProvider.notifier).changeTransaction(
-                    transaction, transactionForm.toTransaction(), ref);
+                    transaction, transactionForm.toTransaction(), ref, context);
                 Navigator.of(context).pop();
               },
             )
@@ -136,7 +135,7 @@ void showFilterOptions(
   showCupertinoModalPopup(
     context: context,
     builder: (_) => CupertinoActionSheet(
-      title: const Text('Фильтровать по:'),
+      title: Text(AppLocalizations.of(context)!.filter),
       actions: filterActions.entries
           .map((entry) => CupertinoActionSheetAction(
                 onPressed: () {
@@ -148,7 +147,7 @@ void showFilterOptions(
           .toList(),
       cancelButton: CupertinoActionSheetAction(
         onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-        child: const Text('Отмена'),
+        child: Text(AppLocalizations.of(context)!.cancel),
       ),
     ),
   );
@@ -160,17 +159,18 @@ void showBalanceDialog(BuildContext context, Balance balance, WidgetRef ref) {
     context: context,
     builder: (BuildContext context) {
       return CupertinoAlertDialog(
-        title: const Text('Баланс', style: TextStyle(fontSize: 22)),
+        title: Text(AppLocalizations.of(context)!.balance,
+            style: const TextStyle(fontSize: 22)),
         content: BalanceModal(balance: balance),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Отмена'),
+            child: Text(AppLocalizations.of(context)!.cancel),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           CupertinoDialogAction(
-            child: const Text('Изменить'),
+            child: Text(AppLocalizations.of(context)!.change),
             onPressed: () {
               balanceNotifier.updateBalance(balance.cash, balance.card);
               Navigator.of(context).pop();

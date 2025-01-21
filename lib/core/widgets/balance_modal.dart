@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/balance.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class BalanceModal extends ConsumerWidget {
   final Balance balance;
   const BalanceModal({super.key, required this.balance});
@@ -26,7 +28,8 @@ class BalanceModal extends ConsumerWidget {
         const SizedBox(
           height: 5,
         ),
-        const Text('Наличные:', style: TextStyle(fontSize: 20)),
+        Text(AppLocalizations.of(context)!.cash,
+            style: TextStyle(fontSize: 20)),
         CupertinoTextField(
           controller: cashController,
           keyboardType: TextInputType.number,
@@ -37,7 +40,8 @@ class BalanceModal extends ConsumerWidget {
             balance.cash = double.tryParse(value) ?? 0;
           },
         ),
-        const Text('Карта:', style: TextStyle(fontSize: 20)),
+        Text(AppLocalizations.of(context)!.card,
+            style: TextStyle(fontSize: 20)),
         CupertinoTextField(
           controller: cardController,
           keyboardType: TextInputType.number,

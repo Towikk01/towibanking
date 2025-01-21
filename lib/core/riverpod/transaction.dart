@@ -1,12 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 
-// transaction_provider.dart
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 final transactionProvider =
     StateNotifierProvider<TransactionNotifier, List<Transaction>>((ref) {
   return TransactionNotifier()..loadTransactions();
@@ -31,7 +33,8 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     prefs.setString('transactions', json.encode(transactionsJson));
   }
 
-  void addTransaction(Transaction transaction, WidgetRef ref) {
+  void addTransaction(
+      Transaction transaction, WidgetRef ref, BuildContext context) {
     state = [
       transaction,
       ...state,
@@ -39,64 +42,64 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     if (transaction.type == 'income') {
       ref
           .watch(balanceProvider.notifier)
-          .addMoney(transaction.amount, transaction.paymentMethod);
+          .addMoney(transaction.amount, transaction.paymentMethod, context);
     } else {
       ref
           .watch(balanceProvider.notifier)
-          .removeMoney(transaction.amount, transaction.paymentMethod);
+          .removeMoney(transaction.amount, transaction.paymentMethod, context);
     }
     ref.watch(balanceProvider.notifier).saveBalance();
     saveTransactions();
   }
 
-  void removeTransaction(Transaction transaction, WidgetRef ref) {
+  void removeTransaction(
+      Transaction transaction, WidgetRef ref, BuildContext context) {
     state = state.where((trans) => trans.date != transaction.date).toList();
     if (transaction.type == 'income') {
       ref
           .watch(balanceProvider.notifier)
-          .removeMoney(transaction.amount, transaction.paymentMethod);
+          .removeMoney(transaction.amount, transaction.paymentMethod, context);
     } else {
       ref
           .watch(balanceProvider.notifier)
-          .addMoney(transaction.amount, transaction.paymentMethod);
+          .addMoney(transaction.amount, transaction.paymentMethod, context);
     }
     ref.watch(balanceProvider.notifier).saveBalance();
     saveTransactions();
   }
 
-  void changeTransaction(
-      Transaction oldTransaction, Transaction newTransaction, WidgetRef ref) {
-    // Revert the old transaction
+  void changeTransaction(Transaction oldTransaction, Transaction newTransaction,
+      WidgetRef ref, BuildContext context) {
     if (oldTransaction.type == 'income') {
-      ref
-          .watch(balanceProvider.notifier)
-          .removeMoney(oldTransaction.amount, oldTransaction.paymentMethod);
+      ref.watch(balanceProvider.notifier).removeMoney(
+          oldTransaction.amount, oldTransaction.paymentMethod, context);
     } else if (oldTransaction.type == 'expense') {
-      ref
-          .watch(balanceProvider.notifier)
-          .addMoney(oldTransaction.amount, oldTransaction.paymentMethod);
+      ref.watch(balanceProvider.notifier).addMoney(
+          oldTransaction.amount, oldTransaction.paymentMethod, context);
     }
 
-    // Apply the new transaction
     if (newTransaction.type == 'income') {
-      ref
-          .watch(balanceProvider.notifier)
-          .addMoney(newTransaction.amount, newTransaction.paymentMethod);
+      ref.watch(balanceProvider.notifier).addMoney(
+          newTransaction.amount, newTransaction.paymentMethod, context);
     } else if (newTransaction.type == 'expense') {
-      ref
-          .watch(balanceProvider.notifier)
-          .removeMoney(newTransaction.amount, newTransaction.paymentMethod);
+      ref.watch(balanceProvider.notifier).removeMoney(
+          newTransaction.amount, newTransaction.paymentMethod, context);
     }
     ref.watch(balanceProvider.notifier).saveBalance();
 
-    // Update the transaction in the state
     state =
         state.map((el) => el == oldTransaction ? newTransaction : el).toList();
     saveTransactions();
   }
 
-  void submitTransaction(String transactionType, String paymentMethod,
-      Category selectedCategory, double amount, String comment, WidgetRef ref) {
+  void submitTransaction(
+      String transactionType,
+      String paymentMethod,
+      Category selectedCategory,
+      double amount,
+      String comment,
+      WidgetRef ref,
+      BuildContext context) {
     if (amount <= 0) return;
 
     final transaction = Transaction(
@@ -108,12 +111,16 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
       comment: comment.isEmpty ? null : comment,
     );
 
-    addTransaction(transaction, ref);
+    addTransaction(transaction, ref, context);
 
     if (transactionType == 'income') {
-      ref.watch(balanceProvider.notifier).addMoney(amount, paymentMethod);
+      ref
+          .watch(balanceProvider.notifier)
+          .addMoney(amount, paymentMethod, context);
     } else if (transactionType == 'expense') {
-      ref.watch(balanceProvider.notifier).removeMoney(amount, paymentMethod);
+      ref
+          .watch(balanceProvider.notifier)
+          .removeMoney(amount, paymentMethod, context);
     }
     saveTransactions();
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:towibanking/core/models/balance.dart';
@@ -32,19 +33,19 @@ class BalanceNotifier extends StateNotifier<Balance> {
     prefs.setDouble('card', state.card);
   }
 
-  void addMoney(double amount, String type) {
-    if (type == 'Наличные') {
+  void addMoney(double amount, String type, BuildContext context) {
+    if (type == 'cash') {
       state = state.copyWith(cash: state.cash + amount);
-    } else if (type == 'Карта') {
+    } else if (type == 'card') {
       state = state.copyWith(card: state.card + amount);
     }
     saveBalance();
   }
 
-  void removeMoney(double amount, String type) {
-    if (type == 'Наличные') {
+  void removeMoney(double amount, String type, BuildContext context) {
+    if (type == 'cash') {
       state = state.copyWith(cash: state.cash - amount);
-    } else if (type == 'Карта') {
+    } else if (type == 'card') {
       state = state.copyWith(card: state.card - amount);
     }
     saveBalance();

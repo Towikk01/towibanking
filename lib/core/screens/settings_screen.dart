@@ -5,9 +5,12 @@ import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 import 'package:towibanking/core/riverpod/category.dart';
 import 'package:towibanking/core/riverpod/currency.dart';
+import 'package:towibanking/core/riverpod/language.dart';
 import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/widgets/add_category.dart';
 import 'package:towibanking/core/widgets/remove_category.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -52,6 +55,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final currencyNotifier = ref.watch(currencyProvider.notifier);
     var selectedKey = currencies.keys.toList()[0];
     final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
+    final language = ref.watch(languageNotifierProvider);
+    final languageNotifier = ref.watch(languageNotifierProvider.notifier);
 
     void addCategory() {
       final newCategory = Category(
@@ -63,13 +68,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text("Настройки"),
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(AppLocalizations.of(context)!.settings),
       ),
       child: ListView(
         children: [
           CupertinoListTile(
-            title: const Text("Темная тема"),
+            title: Text(AppLocalizations.of(context)!.theme),
             trailing: CupertinoSwitch(
               value: isDarkTheme,
               onChanged: (value) {
@@ -78,7 +83,72 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           CupertinoListTile(
-            title: const Text("Валюта"),
+            title: Text(AppLocalizations.of(context)!.language),
+            trailing: CupertinoButton(
+              child: Text(language),
+              onPressed: () {
+                int selectedIndex = AppLocalizations.supportedLocales
+                    .indexWhere((locale) => locale.languageCode == language);
+
+                showCupertinoDialog(
+                  context: context,
+                  builder: (_) {
+                    return CupertinoAlertDialog(
+                      title: Text(AppLocalizations.of(context)!.changeLanguage),
+                      content: Column(
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          SizedBox(
+                            height: 40, // Height for better picker visibility
+                            child: CupertinoPicker(
+                              itemExtent: 40, // Item height
+                              scrollController: FixedExtentScrollController(
+                                initialItem: selectedIndex,
+                              ),
+                              onSelectedItemChanged: (int index) {
+                                selectedIndex = index;
+                              },
+                              children: AppLocalizations.supportedLocales
+                                  .map((locale) {
+                                return Center(
+                                  child: Text(
+                                    locale.languageCode,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: Text(AppLocalizations.of(context)!.cancel),
+                          onPressed: () {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          },
+                        ),
+                        CupertinoDialogAction(
+                          child: Text(AppLocalizations.of(context)!.change),
+                          onPressed: () {
+                            final selectedLocale = AppLocalizations
+                                .supportedLocales[selectedIndex];
+                            languageNotifier
+                                .changeLanguage(selectedLocale.languageCode);
+                            Navigator.of(context, rootNavigator: true).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          CupertinoListTile(
+            title: Text(AppLocalizations.of(context)!.currency),
             trailing: CupertinoButton(
               child: Text(selectedCurrency),
               onPressed: () {
@@ -86,7 +156,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     context: context,
                     builder: (context) {
                       return CupertinoAlertDialog(
-                          title: const Text('Выберите валюту'),
+                          title: Text(
+                              AppLocalizations.of(context)!.changeCurrency),
                           content: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             spacing: 20,
@@ -138,7 +209,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           CupertinoListTile(
-            title: const Text("Добавить категорию"),
+            title: Text(AppLocalizations.of(context)!.addCategory),
             trailing: CupertinoButton(
               child: const Text("+"),
               onPressed: () {
@@ -156,7 +227,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           CupertinoListTile(
-            title: const Text("Удалить категорию"),
+            title: Text(AppLocalizations.of(context)!.removeCategory),
             trailing: CupertinoButton(
               child: const Text("-"),
               onPressed: () {
@@ -170,8 +241,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           CupertinoListTile(
-            title: const Text(
-              "Очистить все данные",
+            title: Text(
+              AppLocalizations.of(context)!.reset,
               style: TextStyle(color: CupertinoColors.destructiveRed),
             ),
             onTap: () {
@@ -184,14 +255,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         "Все данные будут удалены, включая баланс и транзакции"),
                     actions: [
                       CupertinoDialogAction(
-                        child: const Text("Отмена"),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                         onPressed: () {
                           Navigator.of(context, rootNavigator: true)
                               .pop(context);
                         },
                       ),
                       CupertinoDialogAction(
-                        child: const Text("Удалить"),
+                        child: Text(AppLocalizations.of(context)!.reset),
                         isDestructiveAction: true,
                         onPressed: () {
                           balance.reset();

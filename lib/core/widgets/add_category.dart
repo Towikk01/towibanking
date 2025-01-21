@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/riverpod/category.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class CategoriesDialog extends ConsumerStatefulWidget {
   final Category form;
   final List<IconData> icons;
@@ -44,11 +46,13 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
                 children: {
                   'expense': Container(
                     padding: const EdgeInsets.all(10),
-                    child: const Text('Расход', style: TextStyle(fontSize: 20)),
+                    child: Text(AppLocalizations.of(context)!.expense,
+                        style: const TextStyle(fontSize: 20)),
                   ),
                   'income': Container(
                     padding: const EdgeInsets.all(10),
-                    child: const Text('Приход', style: TextStyle(fontSize: 20)),
+                    child: Text(AppLocalizations.of(context)!.income,
+                        style: const TextStyle(fontSize: 20)),
                   ),
                 },
                 groupValue: widget.form.type,
@@ -77,13 +81,13 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
       ),
       actions: [
         CupertinoDialogAction(
-          child: const Text("Отмена"),
+          child: Text(AppLocalizations.of(context)!.cancel),
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
           },
         ),
         CupertinoDialogAction(
-          child: const Text("Добавить"),
+          child: Text(AppLocalizations.of(context)!.add),
           onPressed: () {
             if (categories.any((el) =>
                 el.title == widget.form.title && el.type == widget.form.type)) {

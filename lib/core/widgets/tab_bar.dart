@@ -5,6 +5,8 @@ import 'package:towibanking/core/screens/home_screen.dart';
 import 'package:towibanking/core/screens/profile_screen.dart';
 import 'package:towibanking/core/screens/settings_screen.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class TabBar extends ConsumerStatefulWidget {
   const TabBar({super.key});
 
@@ -20,18 +22,18 @@ class _TabBarState extends ConsumerState<TabBar> {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         height: 60,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.profile_circled),
-            label: 'Профиль',
+            label: AppLocalizations.of(context)!.profile,
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.home),
-            label: 'Главная',
+            label: AppLocalizations.of(context)!.home,
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.settings),
-            label: 'Настройки',
+            label: AppLocalizations.of(context)!.settings,
           ),
         ],
         currentIndex: _selectedIndex, // Reflect the selected index
