@@ -7,8 +7,6 @@ import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction.dart';
 import 'package:towibanking/core/riverpod/balance.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 final transactionProvider =
     StateNotifierProvider<TransactionNotifier, List<Transaction>>((ref) {
   return TransactionNotifier()..loadTransactions();
@@ -24,6 +22,27 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     state = transactionsList
         .map((transactionJson) => Transaction.fromJson(transactionJson))
         .toList();
+  }
+
+  void translateNamesByLocale(String locale) {
+    state = state.map((transaction) {
+
+      final localizedTitle = transaction.category.localTitles?[locale] ??
+          transaction.category.title;
+
+      // Debugging the localized title
+
+
+      return transaction.copyWith(
+        category: transaction.category.copyWith(
+          title: localizedTitle,
+          localTitles: transaction.category.localTitles,
+        ),
+      );
+    }).toList();
+
+
+    saveTransactions();
   }
 
   Future<void> saveTransactions() async {

@@ -23,16 +23,17 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
   Widget build(BuildContext context) {
     final categories = ref.watch(unifiedCategoriesProvider);
     return CupertinoAlertDialog(
-      title: const Text("Добавить категорию", style: TextStyle(fontSize: 20)),
+      title: Text(AppLocalizations.of(context)!.addCategory,
+          style: const TextStyle(fontSize: 20)),
       content: Container(
         margin: const EdgeInsets.only(top: 10),
         child: Column(
-          spacing: 10,
+          spacing: 15,
           children: [
             CupertinoTextField(
               style: const TextStyle(fontSize: 20),
-              padding: const EdgeInsets.all(14),
-              placeholder: "Название категории",
+              padding: const EdgeInsets.all(10),
+              placeholder: AppLocalizations.of(context)!.titleOfCategory,
               onChanged: (value) {
                 widget.form.title = value;
                 setState(() {
@@ -41,17 +42,22 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
               },
             ),
             SizedBox(
+              width: double.infinity,
               child: CupertinoSegmentedControl<String>(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.zero,
                 children: {
                   'expense': Container(
                     padding: const EdgeInsets.all(10),
                     child: Text(AppLocalizations.of(context)!.expense,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 20)),
                   ),
                   'income': Container(
                     padding: const EdgeInsets.all(10),
                     child: Text(AppLocalizations.of(context)!.income,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 20)),
                   ),
                 },
@@ -65,6 +71,7 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
               ),
             ),
             SizedBox(
+              width: double.infinity,
               height: 50,
               child: CupertinoPicker(
                 itemExtent: 50,
@@ -94,8 +101,8 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
               showCupertinoDialog(
                 context: context,
                 builder: (context) => CupertinoAlertDialog(
-                  title: const Text("Ошибка"),
-                  content: const Text("Категория уже существует"),
+                  title: Text(AppLocalizations.of(context)!.error),
+                  content: Text(AppLocalizations.of(context)!.categoryExists),
                   actions: [
                     CupertinoDialogAction(
                       child: const Text("OK"),
@@ -115,8 +122,8 @@ class _CategoriesDialogState extends ConsumerState<CategoriesDialog> {
               showCupertinoDialog(
                 context: context,
                 builder: (context) => CupertinoAlertDialog(
-                  title: const Text("Ошибка"),
-                  content: const Text("Заполните все поля"),
+                  title: Text(AppLocalizations.of(context)!.error),
+                  content: Text(AppLocalizations.of(context)!.completeFields),
                   actions: [
                     CupertinoDialogAction(
                       child: const Text("OK"),

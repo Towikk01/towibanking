@@ -29,7 +29,7 @@ class _TabBarState extends ConsumerState<TabBar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.home),
-            label: AppLocalizations.of(context)!.home,
+            label: AppLocalizations.of(context)!.homeScreen,
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.settings),

@@ -14,11 +14,15 @@ import 'package:towibanking/core/theme/app_colors.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TransactionWidget extends ConsumerWidget {
+  final String locale;
   final Transaction transaction;
   final List<Category> categories;
 
   const TransactionWidget(
-      {super.key, required this.transaction, required this.categories});
+      {super.key,
+      required this.transaction,
+      required this.categories,
+      this.locale = 'ru'});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,24 +98,27 @@ class TransactionWidget extends ConsumerWidget {
                   )
                 ],
               ),
-              title: Row(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${transaction.category.title} - ',
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: isDarkTheme
-                              ? AppColors.lightCream
-                              : AppColors.black)),
-                  SizedBox(
-                    width: 110,
-                    child: Text(
-                        '${transaction.amount.toStringAsFixed(transaction.amount == transaction.amount.toInt() ? 0 : 2)} $currency',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: isDarkTheme
-                                ? AppColors.orange
-                                : CupertinoColors.activeGreen)),
+                  Text(
+                    '${transaction.amount.toStringAsFixed(transaction.amount == transaction.amount.toInt() ? 0 : 2)} $currency',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: isDarkTheme
+                          ? AppColors.orange
+                          : CupertinoColors.activeGreen,
+                    ),
+                  ),
+                  Text(
+                    transaction.category.localTitles?[language] ?? transaction.category.title,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color:
+                          isDarkTheme ? AppColors.lightCream : AppColors.black,
+                    ),
                   ),
                 ],
               ),
@@ -121,7 +128,7 @@ class TransactionWidget extends ConsumerWidget {
                   Text(
                       '${transaction.type == 'income' ? AppLocalizations.of(context)!.income : AppLocalizations.of(context)!.expense} - ${transaction.paymentMethod == 'cash' ? AppLocalizations.of(context)!.cash : AppLocalizations.of(context)!.card}',
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: isDarkTheme
                               ? AppColors.lightCream
                               : AppColors.black)),

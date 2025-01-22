@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/transaction.dart';
 
@@ -40,6 +41,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     currentFilter = AppLocalizations.of(context)!.all;
     filterByDate = AppLocalizations.of(context)!.all;
     selectedCategory = AppLocalizations.of(context)!.all;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final categoryNotifier = ref.read(unifiedCategoriesProvider.notifier);
+      // categoryNotifier.updateCategoriesTitles(context);
+    });
   }
 
   @override
@@ -47,7 +52,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final language = ref.watch(languageNotifierProvider);
     final balance = ref.watch(balanceProvider);
     final transactions = ref.watch(transactionProvider);
-    final categories = ref.watch(unifiedCategoriesProvider);
+    final categories = ref.watch(translatedCategoriesProvider);
+    final categoriesNotifier = ref.watch(unifiedCategoriesProvider.notifier);
     final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
 
     final filterForDate = {
@@ -189,7 +195,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onPressed: (String newFilter) {
                         setState(() {
                           filterByDate = newFilter;
-                          print(filterByDate);
                         });
                       },
                     ),

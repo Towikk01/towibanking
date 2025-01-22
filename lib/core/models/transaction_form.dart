@@ -32,9 +32,28 @@ class TransactionForm {
     );
   }
 
-  
   @override
   String toString() {
     return 'TransactionForm{transactionType: $transactionType, paymentMethod: $paymentMethod, selectedCategory: $selectedCategory, amount: $amount, comment: $comment, date: $date}';
+  }
+
+  Transaction copyWith({
+    String? transactionType,
+    String? paymentMethod,
+    Category? selectedCategory,
+    double? amount,
+    String? comment,
+    DateTime? date,
+    String? id,
+  }) {
+    return Transaction(
+      amount: amount ?? this.amount,
+      type: transactionType ?? this.transactionType,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      category: selectedCategory ?? this.selectedCategory,
+      date: date ?? this.date ?? DateTime.now(),
+      comment: comment ?? this.comment,
+      id: id ?? this.id,
+    );
   }
 }

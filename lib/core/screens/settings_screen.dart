@@ -43,7 +43,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    form = Category(title: '', icon: icons.first, id: '', type: 'expense');
+    form = Category(title: '', icon: icons.first, id: '', type: 'expense', localTitles: {});
   }
 
   @override
@@ -60,6 +60,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     void addCategory() {
       final newCategory = Category(
+          localTitles: {},
           title: form.title,
           icon: form.icon,
           id: DateTime.now().toIso8601String(),
@@ -135,8 +136,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           onPressed: () {
                             final selectedLocale = AppLocalizations
                                 .supportedLocales[selectedIndex];
-                            languageNotifier
-                                .changeLanguage(selectedLocale.languageCode);
+                            languageNotifier.changeLanguage(
+                                selectedLocale.languageCode, ref);
                             Navigator.of(context, rootNavigator: true).pop();
                           },
                         ),
@@ -156,6 +157,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     context: context,
                     builder: (context) {
                       return CupertinoAlertDialog(
+                          actions: [
+                            CupertinoDialogAction(
+                              child: Text(AppLocalizations.of(context)!.cancel),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            CupertinoDialogAction(
+                              child: Text(AppLocalizations.of(context)!.select),
+                              onPressed: () {
+                                setState(() {
+                                  selectedCurrency = currencies[selectedKey]!;
+                                });
+                                currencyNotifier.changeCurrency(selectedKey);
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
                           title: Text(
                               AppLocalizations.of(context)!.changeCurrency),
                           content: Column(
@@ -190,17 +209,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                           ))
                                       .toList(),
                                 ),
-                              ),
-                              CupertinoButton(
-                                sizeStyle: CupertinoButtonSize.small,
-                                child: const Text('Выбрать'),
-                                onPressed: () {
-                                  setState(() {
-                                    selectedCurrency = currencies[selectedKey]!;
-                                  });
-                                  currencyNotifier.changeCurrency(selectedKey);
-                                  Navigator.pop(context);
-                                },
                               ),
                             ],
                           ));
@@ -250,9 +258,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 context: context,
                 builder: (_) {
                   return CupertinoAlertDialog(
-                    title: const Text("Вы уверены?"),
-                    content: const Text(
-                        "Все данные будут удалены, включая баланс и транзакции"),
+                    title: Text(AppLocalizations.of(context)!.sure),
+                    content: Text(AppLocalizations.of(context)!.wholeData),
                     actions: [
                       CupertinoDialogAction(
                         child: Text(AppLocalizations.of(context)!.cancel),

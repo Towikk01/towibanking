@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:towibanking/core/models/category.dart';
 import 'package:towibanking/core/models/transaction_form.dart';
 import 'package:towibanking/core/riverpod/category.dart';
+import 'package:towibanking/core/riverpod/language.dart';
 import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/theme/app_colors.dart';
 
@@ -25,7 +26,7 @@ class TransactionDialogContentState
   @override
   Widget build(BuildContext context) {
     final isDarkTheme = ref.watch(themeProvider).brightness == Brightness.dark;
-
+    final lang = ref.watch(languageNotifierProvider);
     final form = widget.transactionForm;
     final categories = ref.watch(unifiedCategoriesProvider);
     final currentCategories =
@@ -71,7 +72,6 @@ class TransactionDialogContentState
                           el.type == widget.transactionForm.transactionType)
                       .first;
                 });
-                print(form.transactionType);
               },
               groupValue: form.transactionType),
         ),
@@ -160,7 +160,8 @@ class TransactionDialogContentState
             });
           },
           children: currentCategories.map((category) {
-            return Center(child: Text(category.title));
+            return Center(
+                child: Text(category.localTitles?[lang] ?? category.title));
           }).toList(),
         ),
         const SizedBox(height: 20),

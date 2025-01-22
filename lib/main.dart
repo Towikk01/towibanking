@@ -13,7 +13,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initializeDateFormatting('ru', null);
   // await dotenv.load(fileName: ".env");
   // getMono(dotenv.env['MONO_TOKEN']!);
   runApp(const ProviderScope(child: MyApp()));

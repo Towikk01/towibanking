@@ -55,4 +55,24 @@ class Transaction {
   String toString() {
     return "Transaction: $amount, $type, $paymentMethod, $category, $date, $comment, $id";
   }
+
+  Transaction copyWith({
+    double? amount,
+    String? type,
+    String? paymentMethod,
+    Category? category,
+    DateTime? date,
+    String? comment,
+    String? id,
+  }) {
+    return Transaction(
+      amount: amount ?? this.amount,
+      type: type ?? this.type,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      category: category ?? this.category,
+      date: date ?? this.date,
+      comment: comment ?? this.comment,
+      id: id ?? this.id,
+    );
+  }
 }

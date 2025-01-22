@@ -1,11 +1,13 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:towibanking/core/riverpod/transaction.dart';
 
 final languageNotifierProvider =
     StateNotifierProvider<LanguageNotifier, String>((ref) {
   return LanguageNotifier()..loadLanguage();
 });
-
 
 class LanguageNotifier extends StateNotifier<String> {
   LanguageNotifier() : super('en');
@@ -22,7 +24,9 @@ class LanguageNotifier extends StateNotifier<String> {
     state = language;
   }
 
-  void changeLanguage(String language) {
-    saveLanguage(language);
+  Future<void> changeLanguage(String language, WidgetRef ref) async {
+    final transactionsNotifier = ref.watch(transactionProvider.notifier);
+    transactionsNotifier.translateNamesByLocale(language);
+    await saveLanguage(language);
   }
 }
