@@ -6,6 +6,7 @@ import 'package:towibanking/core/screens/profile_screen.dart';
 import 'package:towibanking/core/screens/settings_screen.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:towibanking/core/widgets/shareable_transaction_cart.dart';
 
 class TabBar extends ConsumerStatefulWidget {
   const TabBar({super.key});

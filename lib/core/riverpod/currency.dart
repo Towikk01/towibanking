@@ -5,7 +5,7 @@ final Map<String, String> currencies = {
   'UAH': '₴',
   'USD': '\$',
   'EUR': '€',
-  'ZL': "Złoty",
+  'PLN': "zł",
   'GBP': '£',
   'JPY': '¥',
   'CNY': '¥',

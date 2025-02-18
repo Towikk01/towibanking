@@ -19,6 +19,8 @@ class Transaction {
       this.id,
       this.comment});
 
+
+
   Map<String, dynamic> toJson() => {
         'amount': amount,
         'type': type,

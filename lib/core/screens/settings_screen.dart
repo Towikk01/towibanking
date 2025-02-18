@@ -8,6 +8,7 @@ import 'package:towibanking/core/riverpod/currency.dart';
 import 'package:towibanking/core/riverpod/language.dart';
 import 'package:towibanking/core/riverpod/theme.dart';
 import 'package:towibanking/core/widgets/add_category.dart';
+import 'package:towibanking/core/widgets/hidden_balance.dart';
 import 'package:towibanking/core/widgets/remove_category.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -43,7 +44,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    form = Category(title: '', icon: icons.first, id: '', type: 'expense', localTitles: {});
+    form = Category(
+        title: '', icon: icons.first, id: '', type: 'expense', localTitles: {});
   }
 
   @override
@@ -86,7 +88,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           CupertinoListTile(
             title: Text(AppLocalizations.of(context)!.language),
             trailing: CupertinoButton(
-              child: Text(language),
+              child: Text(
+                language == 'en'
+                    ? 'English'
+                    : language == 'uk'
+                        ? 'Українська'
+                        : language == 'ru'
+                            ? 'Русский'
+                            : language,
+              ),
               onPressed: () {
                 int selectedIndex = AppLocalizations.supportedLocales
                     .indexWhere((locale) => locale.languageCode == language);
@@ -115,7 +125,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .map((locale) {
                                 return Center(
                                   child: Text(
-                                    locale.languageCode,
+                                    locale.languageCode == 'en'
+                                        ? 'English'
+                                        : locale.languageCode == 'uk'
+                                            ? 'Українська'
+                                            : locale.languageCode == 'ru'
+                                                ? 'Русский'
+                                                : locale.languageCode,
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 );
@@ -217,6 +233,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           CupertinoListTile(
+            title: Text(AppLocalizations.of(context)!.hiddenBalance),
+            trailing: CupertinoButton(
+              child: Text(AppLocalizations.of(context)!.showHiddenBalance),
+              onPressed: () {
+                showCupertinoDialog(
+                  context: context,
+                  builder: (_) {
+                    return HiddenBalanceDialog(
+                      currency: selectedCurrency,
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          CupertinoListTile(
             title: Text(AppLocalizations.of(context)!.addCategory),
             trailing: CupertinoButton(
               child: const Text("+"),
@@ -269,13 +301,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         },
                       ),
                       CupertinoDialogAction(
-                        child: Text(AppLocalizations.of(context)!.reset),
                         isDestructiveAction: true,
                         onPressed: () {
                           balance.reset();
                           transactions.reset();
                           Navigator.of(context, rootNavigator: true).pop();
                         },
+                        child: Text(AppLocalizations.of(context)!.reset),
                       ),
                     ],
                   );
