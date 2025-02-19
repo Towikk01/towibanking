@@ -23,11 +23,20 @@ class HiddenBalanceNotifier extends StateNotifier<HiddenBalance> {
     prefs.setDouble('hiddenBalance', state.hiddenBalance);
   }
 
+  Future<void> addHiddenBalance(double hiddenBalance) async {
+    state = state.copyWith(hiddenBalance: state.hiddenBalance + hiddenBalance);
+    await saveHiddenBalance();
+  }
+
+  Future<void> subtractHiddenBalance(double hiddenBalance) async {
+    state = state.copyWith(hiddenBalance: state.hiddenBalance - hiddenBalance);
+    await saveHiddenBalance();
+  }
+
   Future<void> updateHiddenBalance(double hiddenBalance) async {
     state = state.copyWith(hiddenBalance: hiddenBalance);
     await saveHiddenBalance();
   }
-
 
   Future<void> reset() async {
     var prefs = await SharedPreferences.getInstance();

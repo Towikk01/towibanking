@@ -19,6 +19,8 @@
   "transport": "Transport",
   "health": "Health",
     "amount":"Amount",
+      "commentary":"Comment",
+    "close":"Close",
   "details":"Details of transaction",
   "clothes": "Clothes",
   "category":"Category",
